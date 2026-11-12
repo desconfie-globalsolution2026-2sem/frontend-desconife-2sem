@@ -35,33 +35,37 @@
   color-scheme: light;
 }
 
-body {
-  margin: 0;
-  background: #fff;
-  color: var(--color-ink);
-  font-size: 18px;
-  line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
-}
+/* Dentro de @layer base para que as utilities do Tailwind possam sobrescrever.
+   Fora de layer, estas regras venceriam classes como text-white. */
+@layer base {
+  body {
+    margin: 0;
+    background: #fff;
+    color: var(--color-ink);
+    font-size: 18px;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
 
-h1,
-h2,
-h3 {
-  margin: 0;
-  color: var(--color-navy);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
-  text-wrap: balance;
-}
+  h1,
+  h2,
+  h3 {
+    margin: 0;
+    color: var(--color-navy);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
 
-p {
-  margin: 0;
-}
+  p {
+    margin: 0;
+  }
 
-:focus-visible {
-  outline: 3px solid var(--color-navy);
-  outline-offset: 3px;
-  border-radius: 8px;
+  :focus-visible {
+    outline: 3px solid var(--color-navy);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
 }
 
 /* Assinatura: marca-texto ambar sob as palavras que importam */
