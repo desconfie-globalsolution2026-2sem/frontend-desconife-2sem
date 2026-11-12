@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from '../components/layout/Layout.tsx';
+import Contato from '../pages/Contato/Contato.tsx';
 import Home from '../pages/Home/Home.tsx';
 
 function Pagina({ titulo }: { titulo: string }) {
@@ -14,7 +15,7 @@ export default function AppRoutes() {
             <Route path="/quem-somos" element={<Pagina titulo="Quem Somos" />} />
             <Route path="/sobre" element={<Pagina titulo="Sobre" />} />
             <Route path="/faq" element={<Pagina titulo="FAQ" />} />
-            <Route path="/contato" element={<Pagina titulo="Contato" />} />
+            <Route path="/contato" element={<Contato />} />
         </Route>
     </Routes>
   )
