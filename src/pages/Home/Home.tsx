@@ -1,43 +1,8 @@
 import { Link } from 'react-router-dom'
-
-const passos = [
-  {
-    titulo: 'Cole a mensagem ou o link',
-    texto: 'Copie do WhatsApp, do SMS ou do e-mail e cole no campo. Não precisa criar conta.',
-  },
-  {
-    titulo: 'A gente procura os sinais',
-    texto: 'Regras conhecidas de golpe e dois modelos de IA olham o texto e o endereço do link.',
-  },
-  {
-    titulo: 'Você recebe o veredito e o que fazer',
-    texto: 'Cada motivo aparece em português claro, com o passo seguinte: apagar, bloquear ou ligar para o banco.',
-  },
-]
-
-const sinais = [
-  { nome: 'Pressa', peso: '+0,20', codigo: 'URGENCIA', critico: false, texto: '"Só hoje", "últimas horas", "responda agora". Golpista não quer que você pense.' },
-  { nome: 'Pede PIX', peso: '+0,25', codigo: 'PEDE_PIX', critico: false, texto: 'Pedido de transferência para resolver um problema que você não sabia que tinha.' },
-  { nome: 'Pede dados', peso: '+0,30', codigo: 'PEDE_DADOS', critico: false, texto: 'Senha, código do SMS, CPF ou número do cartão. Banco nenhum pede isso por mensagem.' },
-  { nome: 'Ameaça de bloqueio', peso: '+0,20', codigo: 'AMEACA_BLOQUEIO', critico: false, texto: '"Sua conta será bloqueada", "seu CPF está irregular". Medo faz a pessoa agir rápido.' },
-  { nome: 'Prêmio', peso: '+0,20', codigo: 'PREMIO', critico: false, texto: 'Sorteio que você não lembra de ter entrado, sempre com uma "taxa" para liberar.' },
-  { nome: 'Finge ser parente', peso: '+0,25', codigo: 'FINGE_PARENTE', critico: false, texto: '"Oi mãe, troquei de número". Ligue no número antigo antes de qualquer coisa.' },
-  { nome: 'Link suspeito', peso: '+0,35', codigo: 'URL_SUSPEITA', critico: false, texto: 'Endereço com cara de phishing, avaliado por um modelo treinado com 101 mil links.' },
-  { nome: 'Link encurtado', peso: '+0,15', codigo: 'LINK_ENCURTADO', critico: false, texto: 'bit.ly e parecidos escondem o destino real. Empresa séria usa o próprio site.' },
-  { nome: 'Imita uma marca', peso: 'crítico', codigo: 'DOMINIO_IMITA_MARCA', critico: true, texto: 'Usa o nome de um banco ou dos Correios num site que não é o oficial.' },
-]
-
-const vereditos = [
-  { faixa: 'nota a partir de 0,70 ou sinal crítico', titulo: 'Muito provável golpe', texto: 'Não clique, não pague, não responda. Apague e bloqueie o contato.', bg: 'bg-danger-bg', fg: 'text-danger' },
-  { faixa: 'nota de 0,40 a 0,69', titulo: 'Suspeito', texto: 'Confirme por outro caminho: abra o app oficial ou ligue para o número do cartão.', bg: 'bg-warn-bg', fg: 'text-warn' },
-  { faixa: 'nota abaixo de 0,40', titulo: 'Sem sinais de golpe', texto: 'Nada chamou atenção. Mesmo assim, nunca passe senha ou código por mensagem.', bg: 'bg-safe-bg', fg: 'text-safe' },
-]
-
-const garantias = [
-  'Mostra o motivo, não só um "sim" ou "não"',
-  'Funciona com SMS, WhatsApp, e-mail e links',
-  'Esconde CPF, telefone e e-mail antes de guardar',
-]
+import { passos } from '../../data/Home/passos'
+import { sinais } from '../../data/Home/sinais'
+import { vereditos } from '../../data/Home/vereditos'
+import { garantias } from '../../data/Home/garantias'
 
 function Check() {
   return (

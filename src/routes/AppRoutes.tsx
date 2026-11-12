@@ -4,10 +4,7 @@ import Contato from '../pages/Contato/Contato.tsx';
 import FAQ from '../pages/FAQ/FAQ.tsx';
 import Home from '../pages/Home/Home.tsx';
 import QuemSomos from '../pages/QuemSomos/QuemSomos.tsx';
-
-function Pagina({ titulo }: { titulo: string }) {
-  return <main style={{ padding: '24px' }}><h1>{titulo}</h1></main>
-}
+import Sobre from '../pages/Sobre/Sobre.tsx';
 
 export default function AppRoutes() {
   return (
@@ -15,7 +12,7 @@ export default function AppRoutes() {
         <Route element={<Layout />}>
             <Route index element={<Home />} />
             <Route path="/quem-somos" element={<QuemSomos />} />
-            <Route path="/quem-somos" element={<Sobre />} />
+            <Route path="/sobre" element={<Sobre />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contato" element={<Contato />} />
         </Route>
