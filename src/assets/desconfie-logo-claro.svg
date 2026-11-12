@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 470 140" width="1410" height="420">
+  
+  <g transform="translate(8,10)"><defs>
+    <clipPath id="abaixo-c"><polygon points="0,49 120,58 120,120 0,120"/></clipPath>
+    <clipPath id="olho-c"><path d="M22 60 Q60 30 98 60 Q60 90 22 60 Z"/></clipPath>
+  </defs>
+  <path d="M30 12 H90 A24 24 0 0 1 114 36 V80 A24 24 0 0 1 90 104 H54 L32 118 L35 104 H30 A24 24 0 0 1 6 80 V36 A24 24 0 0 1 30 12 Z" fill="#0A2540"/>
+  <g clip-path="url(#abaixo-c)"><g clip-path="url(#olho-c)">
+    <rect x="0" y="0" width="120" height="120" fill="#FFFFFF"/>
+    <circle cx="72" cy="62" r="13" fill="#FFB020"/>
+    <circle cx="75" cy="62" r="5.5" fill="#0A2540"/>
+  </g></g>
+  <path d="M28 36 Q56 20 94 32" fill="none" stroke="#FFB020" stroke-width="7" stroke-linecap="round"/></g>
+  <text x="148" y="88" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="800" font-size="68" letter-spacing="-2.5" fill="#FFFFFF">desconfie</text>
+  <text x="151" y="120" font-family="'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="600" font-size="15" letter-spacing="5.2" fill="#C9D3E0">DETECTOR DE GOLPES</text>
+</svg>
