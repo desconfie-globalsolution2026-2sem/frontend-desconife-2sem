@@ -1,6 +1,8 @@
-import { useState } from 'react'
 import Button from '../../components/button/Button'
+import { classeCampo } from '../../components/form/classeCampo'
 import { passosSocorro } from '../../data/Contato/passosSocorro'
+import { useFormulario } from '../../hooks/useFormulario'
+import { emailValido, marcado, mensagens, textoDe } from '../../utils/validacoes'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
 const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
@@ -21,14 +23,6 @@ type Erros = {
   lgpd?: string
 }
 
-/* Classe do campo muda quando ele tem erro */
-function campo(temErro: boolean) {
-  return [
-    'min-h-[50px] w-full rounded-xl border bg-white px-4 py-3 text-[1.05rem] text-ink',
-    temErro ? 'border-danger' : 'border-line',
-  ].join(' ')
-}
-
 function MsgErro({ id, texto }: { id: string; texto?: string }) {
   if (!texto) return null
   return (
@@ -38,40 +32,25 @@ function MsgErro({ id, texto }: { id: string; texto?: string }) {
   )
 }
 
+/* Regras desta pagina. Fora do componente porque nao dependem de nada dele. */
+function validar(dados: FormData): Erros {
+  const novos: Erros = {}
+  const nome = textoDe(dados, 'nome')
+  const email = textoDe(dados, 'email')
+  const assunto = textoDe(dados, 'assunto')
+  const mensagem = textoDe(dados, 'mensagem')
+
+  if (nome.length < 2) novos.nome = mensagens.nome
+  if (!emailValido(email)) novos.email = mensagens.email
+  if (assunto === '') novos.assunto = 'Escolha um assunto.'
+  if (mensagem.length < 10) novos.mensagem = 'Escreva pelo menos 10 caracteres.'
+  if (!marcado(dados, 'lgpd')) novos.lgpd = 'Marque a caixa acima para enviar.'
+
+  return novos
+}
+
 export default function Contato() {
-  const [erros, setErros] = useState<Erros>({})
-  const [enviado, setEnviado] = useState(false)
-
-  function validar(dados: FormData): Erros {
-    const novos: Erros = {}
-    const nome = String(dados.get('nome') ?? '').trim()
-    const email = String(dados.get('email') ?? '').trim()
-    const assunto = String(dados.get('assunto') ?? '')
-    const mensagem = String(dados.get('mensagem') ?? '').trim()
-
-    if (nome.length < 2) novos.nome = 'Escreva seu nome.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      novos.email = 'Esse e-mail parece incompleto. Confira se tem @ e um ponto depois.'
-    if (assunto === '') novos.assunto = 'Escolha um assunto.'
-    if (mensagem.length < 10) novos.mensagem = 'Escreva pelo menos 10 caracteres.'
-    if (dados.get('lgpd') === null) novos.lgpd = 'Marque a caixa acima para enviar.'
-
-    return novos
-  }
-
-  function aoEnviar(evento: React.FormEvent<HTMLFormElement>) {
-    evento.preventDefault()
-    const form = evento.currentTarget
-    const novos = validar(new FormData(form))
-    setErros(novos)
-
-    if (Object.keys(novos).length === 0) {
-      setEnviado(true)
-      form.reset()
-    } else {
-      setEnviado(false)
-    }
-  }
+  const { erros, sucesso, aoEnviar } = useFormulario(validar)
 
   return (
     <main>
@@ -100,7 +79,7 @@ export default function Contato() {
                 autoComplete="name"
                 aria-invalid={!!erros.nome}
                 aria-describedby={erros.nome ? 'erro-nome' : undefined}
-                className={campo(!!erros.nome)}
+                className={classeCampo(!!erros.nome)}
               />
               <MsgErro id="erro-nome" texto={erros.nome} />
             </div>
@@ -117,7 +96,7 @@ export default function Contato() {
                 autoComplete="email"
                 aria-invalid={!!erros.email}
                 aria-describedby={erros.email ? 'erro-email' : undefined}
-                className={campo(!!erros.email)}
+                className={classeCampo(!!erros.email)}
               />
               <MsgErro id="erro-email" texto={erros.email} />
             </div>
@@ -132,7 +111,7 @@ export default function Contato() {
                 defaultValue=""
                 aria-invalid={!!erros.assunto}
                 aria-describedby={erros.assunto ? 'erro-assunto' : undefined}
-                className={campo(!!erros.assunto)}
+                className={classeCampo(!!erros.assunto)}
               >
                 <option value="">Escolha um assunto</option>
                 {assuntos.map((a) => (
@@ -154,7 +133,7 @@ export default function Contato() {
                 name="mensagem"
                 aria-invalid={!!erros.mensagem}
                 aria-describedby={erros.mensagem ? 'erro-mensagem' : undefined}
-                className={`${campo(!!erros.mensagem)} min-h-[140px] resize-y`}
+                className={`${classeCampo(!!erros.mensagem)} min-h-[140px] resize-y`}
               />
               <MsgErro id="erro-mensagem" texto={erros.mensagem} />
             </div>
@@ -180,7 +159,7 @@ export default function Contato() {
               Enviar mensagem
             </Button>
 
-            {enviado && (
+            {sucesso && (
               <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
                 <strong className="text-safe">Mensagem registrada nesta demonstração.</strong> No
                 site final, ela vai para a equipe pela API do Desconfie.

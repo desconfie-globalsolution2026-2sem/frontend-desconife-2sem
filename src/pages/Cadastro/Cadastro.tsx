@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../../components/button/Button'
 import CampoSenha from '../../components/form/CampoSenha'
+import { classeCampo } from '../../components/form/classeCampo'
 import { pedidos } from '../../data/Cadastro/pedidos'
+import { useFormulario } from '../../hooks/useFormulario'
+import { emailValido, marcado, mensagens, nivelSenha, senhaDe, textoDe } from '../../utils/validacoes'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
 const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
@@ -15,62 +18,31 @@ type Erros = {
   lgpd?: string
 }
 
-function campo(temErro: boolean) {
-  return [
-    'min-h-[50px] w-full rounded-xl border bg-white px-4 py-3 text-[1.05rem] text-ink',
-    temErro ? 'border-danger' : 'border-line',
-  ].join(' ')
-}
-
-/* 0 = vazia, 1 = fraca, 2 = media, 3 = boa */
-function nivelSenha(valor: string) {
-  if (valor === '') return 0
-  let n = 0
-  if (valor.length >= 8) n++
-  if (/[a-zA-Z]/.test(valor) && /\d/.test(valor)) n++
-  if (valor.length >= 12 || /[^a-zA-Z0-9]/.test(valor)) n++
-  return Math.max(1, n)
-}
-
 const coresForca = ['bg-surface-2', 'bg-danger', 'bg-amber', 'bg-safe']
 
+/* Regras desta pagina. Fora do componente porque nao dependem de nada dele. */
+function validar(dados: FormData): Erros {
+  const novos: Erros = {}
+  const nome = textoDe(dados, 'nome')
+  const email = textoDe(dados, 'email')
+  const senha = senhaDe(dados, 'senha')
+  const conf = senhaDe(dados, 'conf')
+
+  if (nome.length < 2) novos.nome = mensagens.nome
+  if (!emailValido(email)) novos.email = mensagens.email
+  if (senha.length < 8 || !/[a-zA-Z]/.test(senha) || !/\d/.test(senha))
+    novos.senha = mensagens.senhaFraca
+  if (conf === '' || conf !== senha) novos.conf = mensagens.senhasDiferentes
+  if (!marcado(dados, 'lgpd')) novos.lgpd = 'Marque a caixa acima para criar a conta.'
+
+  return novos
+}
+
 export default function Cadastro() {
-  const [erros, setErros] = useState<Erros>({})
-  const [criado, setCriado] = useState(false)
+  /* A barra de forca acende enquanto digita, entao o estado fica aqui.
+     O hook zera ela quando o cadastro da certo e o formulario e limpo. */
   const [forca, setForca] = useState(0)
-
-  function validar(dados: FormData): Erros {
-    const novos: Erros = {}
-    const nome = String(dados.get('nome') ?? '').trim()
-    const email = String(dados.get('email') ?? '').trim()
-    const senha = String(dados.get('senha') ?? '')
-    const conf = String(dados.get('conf') ?? '')
-
-    if (nome.length < 2) novos.nome = 'Escreva seu nome.'
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      novos.email = 'Esse e-mail parece incompleto. Confira se tem @ e um ponto depois.'
-    if (senha.length < 8 || !/[a-zA-Z]/.test(senha) || !/\d/.test(senha))
-      novos.senha = 'A senha precisa de pelo menos 8 caracteres, com letras e números.'
-    if (conf === '' || conf !== senha) novos.conf = 'As duas senhas estão diferentes.'
-    if (dados.get('lgpd') === null) novos.lgpd = 'Marque a caixa acima para criar a conta.'
-
-    return novos
-  }
-
-  function aoEnviar(evento: React.FormEvent<HTMLFormElement>) {
-    evento.preventDefault()
-    const form = evento.currentTarget
-    const novos = validar(new FormData(form))
-    setErros(novos)
-
-    if (Object.keys(novos).length === 0) {
-      setCriado(true)
-      setForca(0)
-      form.reset()
-    } else {
-      setCriado(false)
-    }
-  }
+  const { erros, sucesso, aoEnviar } = useFormulario(validar, () => setForca(0))
 
   return (
     <main>
@@ -94,7 +66,7 @@ export default function Cadastro() {
                 name="nome"
                 autoComplete="name"
                 aria-invalid={!!erros.nome}
-                className={campo(!!erros.nome)}
+                className={classeCampo(!!erros.nome)}
               />
               {erros.nome && (
                 <span className="text-[.92rem] font-medium text-danger">{erros.nome}</span>
@@ -113,7 +85,7 @@ export default function Cadastro() {
                 inputMode="email"
                 autoComplete="email"
                 aria-invalid={!!erros.email}
-                className={campo(!!erros.email)}
+                className={classeCampo(!!erros.email)}
               />
               {erros.email && (
                 <span className="text-[.92rem] font-medium text-danger">{erros.email}</span>
@@ -172,7 +144,7 @@ export default function Cadastro() {
               Criar conta
             </Button>
 
-            {criado && (
+            {sucesso && (
               <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
                 <strong className="text-safe">Conta criada nesta demonstração.</strong> No site
                 final, a API Java grava o cadastro no Oracle e você já entra logado.{' '}
