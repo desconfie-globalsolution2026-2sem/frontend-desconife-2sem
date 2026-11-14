@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import Button from '../../components/button/Button'
 import { passos } from '../../data/Home/passos'
 import { sinais } from '../../data/Home/sinais'
 import { vereditos } from '../../data/Home/vereditos'
@@ -127,18 +127,10 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              <Link
-                to="/sobre"
-                className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-navy px-[26px] text-[1.05rem] font-semibold text-white no-underline transition-colors hover:bg-[#163a60]"
-              >
-                Conhecer o Desconfie
-              </Link>
-              <Link
-                to="/faq"
-                className="inline-flex min-h-[50px] items-center justify-center rounded-full px-[26px] text-[1.05rem] font-semibold text-navy no-underline transition-colors hover:bg-surface-2"
-              >
+              <Button to="/sobre">Conhecer o Desconfie</Button>
+              <Button to="/faq" variante="secundario">
                 Ver perguntas
-              </Link>
+              </Button>
             </div>
           </div>
         </div>

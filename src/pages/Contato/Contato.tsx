@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import Button from '../../components/button/Button'
 import { passosSocorro } from '../../data/Contato/passosSocorro'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
@@ -175,12 +176,9 @@ export default function Contato() {
               <MsgErro id="erro-lgpd" texto={erros.lgpd} />
             </div>
 
-            <button
-              type="submit"
-              className="inline-flex min-h-[50px] items-center justify-center rounded-full bg-navy px-6 text-[1.05rem] font-semibold text-white transition-colors hover:bg-[#163a60]"
-            >
+            <Button type="submit">
               Enviar mensagem
-            </button>
+            </Button>
 
             {enviado && (
               <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
