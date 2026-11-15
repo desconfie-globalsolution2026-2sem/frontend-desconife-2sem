@@ -2,7 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Button from '../../components/button/Button'
 import CampoSenha from '../../components/form/CampoSenha'
+import { classeCampo } from '../../components/form/classeCampo'
 import { vantagens } from '../../data/Entrar/vantagens'
+import { useFormulario } from '../../hooks/useFormulario'
+import { emailValido, mensagens, senhaDe, textoDe } from '../../utils/validacoes'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
 const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
@@ -10,13 +13,6 @@ const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
 type Erros = {
   email?: string
   senha?: string
-}
-
-function campo(temErro: boolean) {
-  return [
-    'min-h-[50px] w-full rounded-xl border bg-white px-4 py-3 text-[1.05rem] text-ink',
-    temErro ? 'border-danger' : 'border-line',
-  ].join(' ')
 }
 
 /* Os tres icones da coluna da direita */
@@ -47,36 +43,21 @@ const icones = {
   ),
 }
 
+/* Regras desta pagina. Fora do componente porque nao dependem de nada dele. */
+function validar(dados: FormData): Erros {
+  const novos: Erros = {}
+  const email = textoDe(dados, 'email')
+  const senha = senhaDe(dados, 'senha')
+
+  if (!emailValido(email)) novos.email = mensagens.email
+  if (senha.length < 6) novos.senha = mensagens.senhaCurta
+
+  return novos
+}
+
 export default function Entrar() {
-  const [erros, setErros] = useState<Erros>({})
-  const [entrou, setEntrou] = useState(false)
+  const { erros, sucesso, aoEnviar } = useFormulario(validar)
   const [mostrarEsqueci, setMostrarEsqueci] = useState(false)
-
-  function validar(dados: FormData): Erros {
-    const novos: Erros = {}
-    const email = String(dados.get('email') ?? '').trim()
-    const senha = String(dados.get('senha') ?? '')
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-      novos.email = 'Esse e-mail parece incompleto. Confira se tem @ e um ponto depois.'
-    if (senha.length < 6) novos.senha = 'A senha tem pelo menos 6 caracteres.'
-
-    return novos
-  }
-
-  function aoEnviar(evento: React.FormEvent<HTMLFormElement>) {
-    evento.preventDefault()
-    const form = evento.currentTarget
-    const novos = validar(new FormData(form))
-    setErros(novos)
-
-    if (Object.keys(novos).length === 0) {
-      setEntrou(true)
-      form.reset()
-    } else {
-      setEntrou(false)
-    }
-  }
 
   return (
     <main>
@@ -102,7 +83,7 @@ export default function Entrar() {
                 inputMode="email"
                 autoComplete="username"
                 aria-invalid={!!erros.email}
-                className={campo(!!erros.email)}
+                className={classeCampo(!!erros.email)}
               />
               {erros.email && (
                 <span className="text-[.92rem] font-medium text-danger">{erros.email}</span>
@@ -142,7 +123,7 @@ export default function Entrar() {
               Entrar
             </Button>
 
-            {entrou && (
+            {sucesso && (
               <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
                 <strong className="text-safe">Login feito nesta demonstração.</strong> No site
                 final, a API Java confere o e-mail e a senha e abre o seu histórico.
