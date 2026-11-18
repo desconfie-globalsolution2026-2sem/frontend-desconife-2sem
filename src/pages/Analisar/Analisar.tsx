@@ -1,13 +1,11 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
-import Button from '../../components/button/Button'
 import CardVeredito from '../../components/analise/CardVeredito'
 import MsgErro from '../../components/form/MsgErro'
-import { classeCampo } from '../../components/form/classeCampo'
 import { canais } from '../../data/Analise/canais'
 import { enviarAnalise, modoDemonstracao } from '../../api/analises'
 import type { Analise } from '../../types/Analise/analise'
-import { marcado, textoDe } from '../../utils/validacoes'
+import { mascararDados } from '../../utils/mascarar'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
 const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
@@ -15,6 +13,7 @@ const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
 /* Limite alto o suficiente para um e-mail inteiro, baixo o suficiente para nao
    mandar um livro para a API. */
 const MAX = 2000
+const MIN = 15
 
 type Erros = {
   canal?: string
@@ -22,54 +21,88 @@ type Erros = {
   lgpd?: string
 }
 
-/* Regras desta pagina. Fora do componente porque nao dependem de nada dele. */
-function validar(dados: FormData): Erros {
-  const novos: Erros = {}
-  const canal = textoDe(dados, 'canal')
-  const mensagem = textoDe(dados, 'mensagem')
-
-  if (canal === '') novos.canal = 'Diga por onde a mensagem chegou.'
-  if (mensagem.length < 15) novos.mensagem = 'Cole a mensagem inteira: pelo menos 15 caracteres.'
-  else if (mensagem.length > MAX) novos.mensagem = `Passou de ${MAX} caracteres. Mande só o trecho da mensagem.`
-  if (!marcado(dados, 'lgpd')) novos.lgpd = 'Marque a caixa acima para enviar.'
-
-  return novos
+/* Uma rodada da conversa: o que foi enviado e o que voltou. O veredito e o erro
+   nascem vazios porque chegam depois do await. */
+interface Rodada {
+  id: string
+  canal: string
+  mensagem: string
+  analise?: Analise
+  erro?: string
 }
 
 export default function Analisar() {
+  const [rodadas, setRodadas] = useState<Rodada[]>([])
   const [erros, setErros] = useState<Erros>({})
   const [enviando, setEnviando] = useState(false)
-  const [resultado, setResultado] = useState<Analise | null>(null)
-  /* Falha de rede nao e erro de campo: entra separado, com o botao de tentar de novo. */
-  const [erroEnvio, setErroEnvio] = useState('')
-  const [contagem, setContagem] = useState(0)
+  const [rascunho, setRascunho] = useState('')
+  const [canal, setCanal] = useState('')
+  const [lgpd, setLgpd] = useState(false)
 
-  /* noValidate no form desliga a validacao do navegador para a nossa rodar.
-     O envio e assincrono, por isso esta pagina nao usa o useFormulario: ele
-     foi feito para formulario que termina no proprio clique. */
-  async function aoEnviar(evento: FormEvent<HTMLFormElement>) {
-    evento.preventDefault()
-    const form = evento.currentTarget
-    const dados = new FormData(form)
-    const novos = validar(dados)
-    setErros(novos)
-    setErroEnvio('')
+  const fim = useRef<HTMLDivElement>(null)
 
-    if (Object.keys(novos).length > 0) return
+  /* A conversa cresce para baixo: sem isso a rodada nova nasceria fora da vista. */
+  useEffect(() => {
+    if (rodadas.length > 0) fim.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
+  }, [rodadas])
 
+  function alterar(id: string, mudanca: Partial<Rodada>) {
+    setRodadas((atuais) => atuais.map((r) => (r.id === id ? { ...r, ...mudanca } : r)))
+  }
+
+  /* Chama a API e escreve a resposta na rodada que a pediu. Serve tanto para o
+     primeiro envio quanto para o "tentar de novo". */
+  async function analisar(rodada: Rodada) {
+    alterar(rodada.id, { erro: undefined, analise: undefined })
     setEnviando(true)
     try {
-      const analise = await enviarAnalise({
-        canal: textoDe(dados, 'canal'),
-        mensagem: textoDe(dados, 'mensagem'),
-      })
-      setResultado(analise)
-      form.reset()
-      setContagem(0)
+      const analise = await enviarAnalise({ canal: rodada.canal, mensagem: rodada.mensagem })
+      alterar(rodada.id, { analise })
     } catch {
-      setErroEnvio('Não conseguimos falar com o Desconfie agora. Tente de novo em instantes.')
+      alterar(rodada.id, {
+        erro: 'Não conseguimos falar com o Desconfie agora. Tente de novo em instantes.',
+      })
     } finally {
       setEnviando(false)
+    }
+  }
+
+  /* Validacao propria: o noValidate desliga a do navegador para esta rodar. */
+  function enviar() {
+    const mensagem = rascunho.trim()
+    const novos: Erros = {}
+
+    if (canal === '') novos.canal = 'Diga por onde a mensagem chegou.'
+    if (mensagem.length < MIN) novos.mensagem = `Cole a mensagem inteira: pelo menos ${MIN} caracteres.`
+    else if (mensagem.length > MAX) novos.mensagem = `Passou de ${MAX} caracteres. Mande só o trecho da mensagem.`
+    if (!lgpd) novos.lgpd = 'Marque a caixa para enviar.'
+
+    setErros(novos)
+    if (Object.keys(novos).length > 0) return
+
+    /* A mensagem entra na conversa ja mascarada: assim o que esta na tela e
+       exatamente o que saiu do navegador. */
+    const rodada: Rodada = {
+      id: crypto.randomUUID(),
+      canal,
+      mensagem: mascararDados(mensagem),
+    }
+    setRodadas((atuais) => [...atuais, rodada])
+    setRascunho('')
+    void analisar(rodada)
+  }
+
+  function aoEnviar(evento: FormEvent<HTMLFormElement>) {
+    evento.preventDefault()
+    enviar()
+  }
+
+  /* Enter manda, Shift+Enter pula linha. Colar texto com varias linhas continua
+     funcionando: paste nao passa por aqui. */
+  function aoTeclar(evento: KeyboardEvent<HTMLTextAreaElement>) {
+    if (evento.key === 'Enter' && !evento.shiftKey) {
+      evento.preventDefault()
+      enviar()
     }
   }
 
@@ -86,127 +119,187 @@ export default function Analisar() {
         </p>
       </div>
 
-      <section className="py-18">
-        <div className={`${wrap} grid gap-9 md:grid-cols-[1.1fr_1fr] md:gap-14`}>
-          <form noValidate onSubmit={aoEnviar} className="grid gap-5 rounded-[28px] bg-surface p-7">
-            <div className="grid gap-1.5">
-              <label htmlFor="canal" className="font-semibold text-navy">
-                Por onde chegou?
-              </label>
-              <select
-                id="canal"
-                name="canal"
-                defaultValue=""
-                aria-invalid={!!erros.canal}
-                aria-describedby={erros.canal ? 'erro-canal' : undefined}
-                className={classeCampo(!!erros.canal)}
-              >
-                <option value="">Escolha o canal</option>
-                {canais.map((c) => (
-                  <option key={c}>{c}</option>
-                ))}
-              </select>
-              <MsgErro id="erro-canal" texto={erros.canal} />
+      <section className="pt-6 pb-18">
+        <div className={`${wrap} grid gap-3`}>
+          <div className="flex flex-col overflow-hidden rounded-[28px] border border-line bg-surface">
+            {/* A conversa. aria-live para o leitor de tela anunciar o veredito novo. */}
+            <div
+              aria-live="polite"
+              className="grid max-h-[60vh] min-h-[420px] content-start gap-7 overflow-y-auto px-5 py-7 md:px-8"
+            >
+              {rodadas.length === 0 ? (
+                <div className="grid content-start gap-4">
+                  <p className={eyebrow}>Antes de colar</p>
+                  <ul className="grid max-w-[62ch] list-none gap-3 p-0 text-[1.02rem] text-muted">
+                    <li>
+                      <strong className="text-ink">Cole o link também.</strong> Boa parte do peso da
+                      nota vem do endereço, não do texto.
+                    </li>
+                    <li>
+                      <strong className="text-ink">Mande a mensagem como chegou.</strong> Pressa,
+                      ameaça e erro de português são sinais que o modelo usa.
+                    </li>
+                    <li>
+                      <strong className="text-ink">Não clique para "conferir".</strong> Um clique já
+                      entrega que o número existe.
+                    </li>
+                    <li>
+                      <strong className="text-ink">Não escreva senha.</strong> CPF, cartão, telefone
+                      e e-mail saem mascarados antes do envio.
+                    </li>
+                  </ul>
+                  <p className="text-[.95rem] text-muted">
+                    O veredito aparece aqui, abaixo da mensagem que você colar.
+                  </p>
+                </div>
+              ) : (
+                rodadas.map((r) => (
+                  <div key={r.id} className="grid gap-4">
+                    {/* O que foi enviado, alinhado a direita. */}
+                    <div className="flex justify-end">
+                      <div className="max-w-[85%] rounded-[22px] rounded-br-md bg-navy px-5 py-3.5 text-white">
+                        <p className="text-[.85rem] font-semibold text-white/70">{r.canal}</p>
+                        <p className="mt-1 whitespace-pre-wrap text-[1.05rem] leading-[1.45]">
+                          {r.mensagem}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* O que voltou: veredito, falha de rede ou espera. */}
+                    {r.analise ? (
+                      <div className="grid gap-2">
+                        <CardVeredito analise={r.analise} />
+                        <p className="text-[.98rem] text-muted">
+                          Essa análise já está em{' '}
+                          <Link to="/minhas-analises" className="font-semibold text-navy">
+                            minhas análises
+                          </Link>
+                          .
+                        </p>
+                      </div>
+                    ) : r.erro ? (
+                      <div role="alert" className="grid justify-items-start gap-3 rounded-[28px] bg-danger-bg p-7">
+                        <p className="text-ink">
+                          <strong className="text-danger">Deu erro no envio.</strong> {r.erro}
+                        </p>
+                        <button
+                          type="button"
+                          disabled={enviando}
+                          onClick={() => void analisar(r)}
+                          className="min-h-11 rounded-full border border-navy bg-white px-4 font-semibold text-navy transition-colors hover:bg-surface-2 disabled:opacity-60"
+                        >
+                          Tentar de novo
+                        </button>
+                      </div>
+                    ) : (
+                      <p className="font-mono text-[1.02rem] text-muted">Analisando a mensagem…</p>
+                    )}
+                  </div>
+                ))
+              )}
+
+              <div ref={fim} />
             </div>
 
-            <div className="grid gap-1.5">
-              <label htmlFor="mensagem" className="font-semibold text-navy">
-                A mensagem
-              </label>
-              <span className="text-[.9rem] text-muted">
-                Cole o texto inteiro, com o link. Não escreva senhas, CPF ou número de cartão — se
-                vier junto, mascaramos antes de enviar.
-              </span>
-              <textarea
-                id="mensagem"
-                name="mensagem"
-                maxLength={MAX}
-                onChange={(e) => setContagem(e.currentTarget.value.length)}
-                aria-invalid={!!erros.mensagem}
-                aria-describedby={erros.mensagem ? 'erro-mensagem' : 'contagem-mensagem'}
-                className={`${classeCampo(!!erros.mensagem)} min-h-[190px] resize-y`}
-              />
-              <div className="flex flex-wrap items-baseline justify-between gap-2">
-                <MsgErro id="erro-mensagem" texto={erros.mensagem} />
-                <span id="contagem-mensagem" className="ml-auto font-mono text-[.85rem] text-muted">
-                  {contagem}/{MAX}
-                </span>
+            {/* Rodape do bloco: canal, mensagem e a autorizacao, tudo em um envio. */}
+            <form
+              noValidate
+              onSubmit={aoEnviar}
+              className="grid gap-3 border-t border-line bg-white px-5 py-5 md:px-8"
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <label htmlFor="canal" className="font-semibold text-navy">
+                  Por onde chegou?
+                </label>
+                <select
+                  id="canal"
+                  name="canal"
+                  value={canal}
+                  onChange={(e) => setCanal(e.currentTarget.value)}
+                  aria-invalid={!!erros.canal}
+                  aria-describedby={erros.canal ? 'erro-canal' : undefined}
+                  className={[
+                    'min-h-11 rounded-full border bg-white px-4 text-[1rem] text-ink',
+                    erros.canal ? 'border-danger' : 'border-line',
+                  ].join(' ')}
+                >
+                  <option value="">Escolha o canal</option>
+                  {canais.map((c) => (
+                    <option key={c}>{c}</option>
+                  ))}
+                </select>
+                <MsgErro id="erro-canal" texto={erros.canal} />
               </div>
-            </div>
 
-            <div className="grid gap-1.5">
-              <label htmlFor="lgpd" className="flex items-start gap-2.5 text-[.98rem]">
-                <input
-                  type="checkbox"
-                  id="lgpd"
-                  name="lgpd"
-                  aria-invalid={!!erros.lgpd}
-                  aria-describedby={erros.lgpd ? 'erro-lgpd' : undefined}
-                  className="mt-1 size-5 shrink-0 accent-navy"
+              <div className="flex items-end gap-3">
+                <label htmlFor="mensagem" className="sr-only">
+                  A mensagem que você quer analisar
+                </label>
+                <textarea
+                  id="mensagem"
+                  name="mensagem"
+                  rows={3}
+                  maxLength={MAX}
+                  value={rascunho}
+                  placeholder="Cole a mensagem aqui, com o link e tudo…"
+                  onChange={(e) => setRascunho(e.currentTarget.value)}
+                  onKeyDown={aoTeclar}
+                  aria-invalid={!!erros.mensagem}
+                  aria-describedby={erros.mensagem ? 'erro-mensagem' : 'contagem-mensagem'}
+                  className={[
+                    'max-h-[220px] min-h-[92px] w-full resize-y rounded-2xl border bg-white px-4 py-3 text-[1.05rem] text-ink',
+                    erros.mensagem ? 'border-danger' : 'border-line',
+                  ].join(' ')}
                 />
-                <span>
-                  Concordo que o Desconfie guarde esta mensagem, já sem dados pessoais, para gerar a
-                  análise e melhorar a detecção.
-                </span>
-              </label>
-              <MsgErro id="erro-lgpd" texto={erros.lgpd} />
-            </div>
-
-            {/* aria-busy avisa o leitor de tela de que o botao esta ocupado. */}
-            <Button type="submit" disabled={enviando} aria-busy={enviando}
-              className={enviando ? 'opacity-60' : ''}>
-              {enviando ? 'Analisando…' : 'Analisar mensagem'}
-            </Button>
-
-            {erroEnvio && (
-              <p role="alert" className="rounded-2xl bg-danger-bg p-4 text-ink">
-                <strong className="text-danger">Deu erro no envio.</strong> {erroEnvio}
-              </p>
-            )}
-
-            {modoDemonstracao() && (
-              <p className="text-[.95rem] text-muted">
-                Demonstração: a API de decisão ainda não está ligada, então a nota sai de uma regra
-                local e as análises ficam só neste navegador.
-              </p>
-            )}
-          </form>
-
-          <div className="grid content-start gap-6">
-            {resultado ? (
-              <>
-                <CardVeredito analise={resultado} />
-                <p className="text-[.98rem] text-muted">
-                  Essa análise já está em{' '}
-                  <Link to="/minhas-analises" className="font-semibold text-navy">
-                    minhas análises
-                  </Link>
-                  .
-                </p>
-              </>
-            ) : (
-              <div className="grid content-start gap-4 rounded-[28px] border border-line p-7">
-                <p className={eyebrow}>Antes de enviar</p>
-                <ul className="grid list-none gap-3 p-0 text-[1.02rem] text-muted">
-                  <li>
-                    <strong className="text-ink">Cole o link também.</strong> Boa parte do peso da
-                    nota vem do endereço, não do texto.
-                  </li>
-                  <li>
-                    <strong className="text-ink">Mande a mensagem como chegou.</strong> Pressa,
-                    ameaça e erro de português são sinais que o modelo usa.
-                  </li>
-                  <li>
-                    <strong className="text-ink">Não clique para "conferir".</strong> Um clique já
-                    entrega que o número existe.
-                  </li>
-                </ul>
-                <p className="text-[.95rem] text-muted">
-                  O veredito aparece aqui assim que a análise terminar.
-                </p>
+                {/* aria-busy avisa o leitor de tela de que o botao esta ocupado. */}
+                <button
+                  type="submit"
+                  disabled={enviando}
+                  aria-busy={enviando}
+                  aria-label="Analisar mensagem"
+                  className="grid size-12 shrink-0 place-items-center rounded-full bg-navy text-[1.3rem] text-white transition-colors hover:bg-[#163a60] disabled:bg-surface-2 disabled:text-muted"
+                >
+                  <span aria-hidden="true">↑</span>
+                </button>
               </div>
-            )}
+
+              <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-2">
+                <div className="grid gap-1.5">
+                  <label htmlFor="lgpd" className="flex items-start gap-2.5 text-[.95rem]">
+                    <input
+                      type="checkbox"
+                      id="lgpd"
+                      name="lgpd"
+                      checked={lgpd}
+                      onChange={(e) => setLgpd(e.currentTarget.checked)}
+                      aria-invalid={!!erros.lgpd}
+                      aria-describedby={erros.lgpd ? 'erro-lgpd' : undefined}
+                      className="mt-0.5 size-5 shrink-0 accent-navy"
+                    />
+                    <span className="max-w-[62ch] text-muted">
+                      Concordo que o Desconfie guarde esta mensagem, já sem dados pessoais, para
+                      gerar a análise e melhorar a detecção.
+                    </span>
+                  </label>
+                  <MsgErro id="erro-lgpd" texto={erros.lgpd} />
+                </div>
+
+                <div className="ml-auto grid justify-items-end gap-1">
+                  <MsgErro id="erro-mensagem" texto={erros.mensagem} />
+                  <span id="contagem-mensagem" className="font-mono text-[.85rem] text-muted">
+                    {rascunho.length}/{MAX}
+                  </span>
+                </div>
+              </div>
+            </form>
           </div>
+
+          {modoDemonstracao() && (
+            <p className="text-[.95rem] text-muted">
+              Demonstração: a API de decisão ainda não está ligada, então a nota sai de uma regra
+              local e as análises ficam só neste navegador.
+            </p>
+          )}
         </div>
       </section>
     </main>
