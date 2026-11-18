@@ -41,7 +41,8 @@ export default function Analisar() {
 
   const fim = useRef<HTMLDivElement>(null)
 
-  /* A conversa cresce para baixo: sem isso a rodada nova nasceria fora da vista. */
+  /* O bloco cresce com a pagina, sem rolagem interna: a rodada nova fica abaixo
+     da dobra, entao a propria pagina desce ate ela. */
   useEffect(() => {
     if (rodadas.length > 0) fim.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [rodadas])
@@ -125,31 +126,38 @@ export default function Analisar() {
             {/* A conversa. aria-live para o leitor de tela anunciar o veredito novo. */}
             <div
               aria-live="polite"
-              className="grid max-h-[60vh] min-h-[420px] content-start gap-7 overflow-y-auto px-5 py-7 md:px-8"
+              className="grid min-h-[420px] content-start gap-7 px-5 py-7 md:px-8"
             >
               {rodadas.length === 0 ? (
                 <div className="grid content-start gap-4">
                   <p className={eyebrow}>Antes de colar</p>
-                  <ul className="grid max-w-[62ch] list-none gap-3 p-0 text-[1.02rem] text-muted">
+                  <p className="max-w-[58ch] text-[1.15rem] text-ink">
+                    Quatro coisas mudam o resultado da análise:
+                  </p>
+                  <ul className="grid max-w-[62ch] list-none gap-3.5 p-0 text-[1.02rem] text-muted">
                     <li>
-                      <strong className="text-ink">Cole o link também.</strong> Boa parte do peso da
-                      nota vem do endereço, não do texto.
+                      <strong className="text-ink">Cole o link junto.</strong> O endereço pesa mais
+                      que o texto. É nele que aparece o domínio que imita o banco — e sem ele a
+                      análise fica cega.
                     </li>
                     <li>
-                      <strong className="text-ink">Mande a mensagem como chegou.</strong> Pressa,
-                      ameaça e erro de português são sinais que o modelo usa.
+                      <strong className="text-ink">Não arrume a mensagem.</strong> A pressa, a ameaça
+                      de bloqueio e o erro de português são a prova. Reescrever com suas palavras
+                      apaga exatamente o que a gente procura.
                     </li>
                     <li>
-                      <strong className="text-ink">Não clique para "conferir".</strong> Um clique já
-                      entrega que o número existe.
+                      <strong className="text-ink">Não clique para conferir.</strong> Abrir o link já
+                      avisa ao golpista que o seu número está ativo. Cole aqui primeiro: é para isso
+                      que esta tela existe.
                     </li>
                     <li>
-                      <strong className="text-ink">Não escreva senha.</strong> CPF, cartão, telefone
-                      e e-mail saem mascarados antes do envio.
+                      <strong className="text-ink">Senha e código ficam com você.</strong> CPF,
+                      cartão, telefone e e-mail saem mascarados daqui. Senha e código do banco
+                      nenhuma análise precisa — apague antes de enviar.
                     </li>
                   </ul>
                   <p className="text-[.95rem] text-muted">
-                    O veredito aparece aqui, abaixo da mensagem que você colar.
+                    O veredito aparece aqui, logo abaixo da mensagem, com a nota e o que pesou nela.
                   </p>
                 </div>
               ) : (
