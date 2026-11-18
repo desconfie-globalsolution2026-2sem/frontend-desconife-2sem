@@ -4,6 +4,8 @@ import Logo from '../../assets/desconfie-logo.svg'
 const navItems = [
   { path: '/', label: 'Início' },
   { path: '/quem-somos', label: 'Quem somos' },
+  { path: '/analisar', label: 'Analisar' },
+  { path: '/minhas-analises', label: 'Minhas análises' },
   { path: '/sobre', label: 'Sobre' },
   { path: '/faq', label: 'Perguntas' },
   { path: '/contato', label: 'Contato' },
