@@ -5,7 +5,7 @@ import CardVeredito from '../../components/analise/CardVeredito'
 import MsgErro from '../../components/form/MsgErro'
 import { classeCampo } from '../../components/form/classeCampo'
 import { canais } from '../../data/Analise/canais'
-import { enviarAnalise, modoDemonstracao } from '../../services/analises'
+import { enviarAnalise, modoDemonstracao } from '../../api/analises'
 import type { Analise } from '../../types/Analise/analise'
 import { marcado, textoDe } from '../../utils/validacoes'
 

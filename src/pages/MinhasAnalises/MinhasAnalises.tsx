@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import Button from '../../components/button/Button'
 import SeloFaixa from '../../components/analise/SeloFaixa'
-import { apagarAnalises, listarAnalises, modoDemonstracao } from '../../services/analises'
+import { apagarAnalises, listarAnalises, modoDemonstracao } from '../../api/analises'
 import type { Analise, Faixa } from '../../types/Analise/analise'
 import { dataHoraBr, notaBr, pesoBr } from '../../utils/formatar'
 

@@ -5,7 +5,7 @@
  * telas: quando a API Java definir os endpoints, muda neste arquivo e pronto.
  *
  * Enquanto um caminho estiver vazio, o service correspondente usa o mock local
- * (src/services/mockAnalises.ts), para a tela continuar demonstravel.
+ * (src/api/mockAnalises.ts), para a tela continuar demonstravel.
  */
 
 const BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
