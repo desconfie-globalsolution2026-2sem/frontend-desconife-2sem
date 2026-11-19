@@ -3,6 +3,7 @@ import type {
   AnaliseRequest,
   AnaliseResponse,
   AnaliseResumoResponse,
+  CirculoAnaliseResponse,
   FeedbackRequest,
 } from '../../types/Api/dtos'
 import { del, get, post, put } from '../api'
@@ -12,6 +13,10 @@ export const analisar = (usuarioId: number, dados: AnaliseRequest) =>
 
 export const listarAnalisesDoUsuario = (usuarioId: number) =>
   get<AnaliseResumoResponse[]>(`/usuarios/${usuarioId}/analises`)
+
+/* Analises dos dependentes, vistas pelo guardiao. */
+export const listarAnalisesDoCirculo = (usuarioId: number) =>
+  get<CirculoAnaliseResponse[]>(`/usuarios/${usuarioId}/circulo/analises`)
 
 export const listarTodasAnalises = () => get<AnaliseResumoResponse[]>('/analises')
 

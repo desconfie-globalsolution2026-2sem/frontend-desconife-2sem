@@ -11,6 +11,12 @@ export function pesoBr(peso: number) {
   return `+${notaBr(peso)}`
 }
 
+/* "2026-10-04" -> "04/10/2026". Por texto, sem Date: Date leria como UTC e
+   no Brasil voltaria um dia. */
+export function dataBr(iso: string) {
+  return iso.slice(0, 10).split('-').reverse().join('/')
+}
+
 /* ISO -> "17/11/2026 às 20:52" */
 export function dataHoraBr(iso: string) {
   const data = new Date(iso)
