@@ -1,8 +1,8 @@
 import Button from '../../components/button/Button'
 import { passos } from '../../data/Home/passos'
-import { sinais } from '../../data/Home/sinais'
 import { vereditos } from '../../data/Home/vereditos'
 import { garantias } from '../../data/Home/garantias'
+import { useSinais } from '../../hooks/useSinais'
 
 function Check() {
   return (
@@ -13,6 +13,8 @@ function Check() {
 }
 
 export default function Home() {
+  const sinais = useSinais()
+
   return (
     <main>
       {/* Hero */}
