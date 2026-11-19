@@ -1,22 +1,27 @@
 /* Formatacao para pt-BR. Fica fora das telas para nota e data saírem iguais em
    todas elas. */
 
-/* 0.82 -> "0,82" */
+/* A API da a nota de 0 a 100: 86.04 -> "86" */
 export function notaBr(nota: number) {
-  return nota.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return Math.round(nota).toLocaleString('pt-BR')
 }
 
-/* 0.25 -> "+0,25", igual a tabela de sinais da Home. */
+/* Peso de um padrao: 25 -> "+25" */
 export function pesoBr(peso: number) {
   return `+${notaBr(peso)}`
 }
 
-/* ISO -> "17/11/2026 às 20:52" */
+/* ISO -> "17/11/2026 às 20:52". A API (no Render, em UTC) manda a data sem fuso,
+   entao sem o "Z" o navegador leria como hora local e mostraria 3h a mais. */
 export function dataHoraBr(iso: string) {
-  const data = new Date(iso)
+  const temFuso = /(Z|[+-]\d{2}:?\d{2})$/.test(iso)
+  const data = new Date(temFuso ? iso : `${iso}Z`)
   if (Number.isNaN(data.getTime())) return '—'
   return `${data.toLocaleDateString('pt-BR')} às ${data.toLocaleTimeString('pt-BR', {
     hour: '2-digit',
     minute: '2-digit',
   })}`
 }
+
+/* Nome do tipo de analise para a tela. */
+export const nomeDoTipo = { TEXTO: 'Mensagem', LINK: 'Link', IMAGEM: 'Imagem' } as const

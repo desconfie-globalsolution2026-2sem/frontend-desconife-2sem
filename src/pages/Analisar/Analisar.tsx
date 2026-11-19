@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Link } from 'react-router-dom'
+import { mensagemDeErro } from '../../api/api'
+import { criarAnalise } from '../../api/endpoints/analises'
 import CardVeredito from '../../components/analise/CardVeredito'
+import PedirLogin from '../../components/analise/PedirLogin'
 import MsgErro from '../../components/form/MsgErro'
-import { canais } from '../../data/Analise/canais'
-import { enviarAnalise, modoDemonstracao } from '../../api/analises'
-import type { Analise } from '../../types/Analise/analise'
+import { useSessao } from '../../hooks/useSessao'
+import type { AnaliseResponse, TipoAnalise } from '../../types/Api/dtos'
+import { nomeDoTipo } from '../../utils/formatar'
 import { mascararDados } from '../../utils/mascarar'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
@@ -15,8 +18,16 @@ const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
 const MAX = 2000
 const MIN = 15
 
+/* Link sozinho, sem espaco: e o que a API espera quando o tipo e LINK. */
+const REGEX_LINK = /^(https?:\/\/)?[^\s/]+\.[^\s]+$/i
+
+/* So texto e link por aqui; imagem fica para o app. */
+const tipos: { valor: TipoAnalise; label: string }[] = [
+  { valor: 'TEXTO', label: 'Uma mensagem (SMS, WhatsApp, e-mail)' },
+  { valor: 'LINK', label: 'Só um link' },
+]
+
 type Erros = {
-  canal?: string
   mensagem?: string
   lgpd?: string
 }
@@ -25,18 +36,19 @@ type Erros = {
    nascem vazios porque chegam depois do await. */
 interface Rodada {
   id: string
-  canal: string
+  tipo: TipoAnalise
   mensagem: string
-  analise?: Analise
+  analise?: AnaliseResponse
   erro?: string
 }
 
 export default function Analisar() {
+  const { usuario } = useSessao()
   const [rodadas, setRodadas] = useState<Rodada[]>([])
   const [erros, setErros] = useState<Erros>({})
   const [enviando, setEnviando] = useState(false)
   const [rascunho, setRascunho] = useState('')
-  const [canal, setCanal] = useState('')
+  const [tipo, setTipo] = useState<TipoAnalise>('TEXTO')
   const [lgpd, setLgpd] = useState(false)
 
   const fim = useRef<HTMLDivElement>(null)
@@ -54,15 +66,14 @@ export default function Analisar() {
   /* Chama a API e escreve a resposta na rodada que a pediu. Serve tanto para o
      primeiro envio quanto para o "tentar de novo". */
   async function analisar(rodada: Rodada) {
+    if (!usuario) return
     alterar(rodada.id, { erro: undefined, analise: undefined })
     setEnviando(true)
     try {
-      const analise = await enviarAnalise({ canal: rodada.canal, mensagem: rodada.mensagem })
+      const analise = await criarAnalise(usuario.id, { tipo: rodada.tipo, conteudo: rodada.mensagem })
       alterar(rodada.id, { analise })
-    } catch {
-      alterar(rodada.id, {
-        erro: 'Não conseguimos falar com o Desconfie agora. Tente de novo em instantes.',
-      })
+    } catch (erro) {
+      alterar(rodada.id, { erro: mensagemDeErro(erro) })
     } finally {
       setEnviando(false)
     }
@@ -73,8 +84,11 @@ export default function Analisar() {
     const mensagem = rascunho.trim()
     const novos: Erros = {}
 
-    if (canal === '') novos.canal = 'Diga por onde a mensagem chegou.'
-    if (mensagem.length < MIN) novos.mensagem = `Cole a mensagem inteira: pelo menos ${MIN} caracteres.`
+    if (tipo === 'LINK') {
+      if (!REGEX_LINK.test(mensagem))
+        novos.mensagem = 'Isso não parece um link. Cole só o endereço, ex.: bit.ly/abc123.'
+    } else if (mensagem.length < MIN)
+      novos.mensagem = `Cole a mensagem inteira: pelo menos ${MIN} caracteres.`
     else if (mensagem.length > MAX) novos.mensagem = `Passou de ${MAX} caracteres. Mande só o trecho da mensagem.`
     if (!lgpd) novos.lgpd = 'Marque a caixa para enviar.'
 
@@ -85,7 +99,7 @@ export default function Analisar() {
        exatamente o que saiu do navegador. */
     const rodada: Rodada = {
       id: crypto.randomUUID(),
-      canal,
+      tipo,
       mensagem: mascararDados(mensagem),
     }
     setRodadas((atuais) => [...atuais, rodada])
@@ -116,12 +130,15 @@ export default function Analisar() {
         </h1>
         <p className="mt-4.5 max-w-[58ch] text-[clamp(1.15rem,1.8vw,1.35rem)] leading-[1.5] text-muted">
           Recebeu um SMS estranho, um link do banco ou um "oi mãe, troquei de número"? Cole aqui
-          antes de clicar. A análise leva alguns segundos e não precisa do seu nome.
+          antes de clicar. A análise leva alguns segundos e fica guardada na sua conta.
         </p>
       </div>
 
       <section className="pt-6 pb-18">
         <div className={`${wrap} grid gap-3`}>
+          {!usuario ? (
+            <PedirLogin texto="Cada análise fica guardada na sua conta, para você rever depois e dizer se era golpe mesmo. Leva menos de um minuto para criar." />
+          ) : (
           <div className="flex flex-col overflow-hidden rounded-[28px] border border-line bg-surface">
             {/* A conversa. aria-live para o leitor de tela anunciar o veredito novo. */}
             <div
@@ -166,8 +183,8 @@ export default function Analisar() {
                     {/* O que foi enviado, alinhado a direita. */}
                     <div className="flex justify-end">
                       <div className="max-w-[85%] rounded-[22px] rounded-br-md bg-navy px-5 py-3.5 text-white">
-                        <p className="text-[.85rem] font-semibold text-white/70">{r.canal}</p>
-                        <p className="mt-1 whitespace-pre-wrap text-[1.05rem] leading-[1.45]">
+                        <p className="text-[.85rem] font-semibold text-white/70">{nomeDoTipo[r.tipo]}</p>
+                        <p className="mt-1 whitespace-pre-wrap break-words text-[1.05rem] leading-[1.45]">
                           {r.mensagem}
                         </p>
                       </div>
@@ -178,11 +195,10 @@ export default function Analisar() {
                       <div className="grid gap-2">
                         <CardVeredito analise={r.analise} />
                         <p className="text-[.98rem] text-muted">
-                          Essa análise já está em{' '}
-                          <Link to="/minhas-analises" className="font-semibold text-navy">
-                            minhas análises
+                          Análise nº {r.analise.id} salva.{' '}
+                          <Link to={`/analises/${r.analise.id}`} className="font-semibold text-navy">
+                            Ver detalhes e dizer se era golpe
                           </Link>
-                          .
                         </p>
                       </div>
                     ) : r.erro ? (
@@ -200,7 +216,9 @@ export default function Analisar() {
                         </button>
                       </div>
                     ) : (
-                      <p className="font-mono text-[1.02rem] text-muted">Analisando a mensagem…</p>
+                      <p role="status" className="font-mono text-[1.02rem] text-muted">
+                        Analisando… a primeira análise do dia pode levar até um minuto.
+                      </p>
                     )}
                   </div>
                 ))
@@ -216,27 +234,22 @@ export default function Analisar() {
               className="grid gap-3 border-t border-line bg-white px-5 py-5 md:px-8"
             >
               <div className="flex flex-wrap items-center gap-3">
-                <label htmlFor="canal" className="font-semibold text-navy">
-                  Por onde chegou?
+                <label htmlFor="tipo" className="font-semibold text-navy">
+                  O que você vai colar?
                 </label>
                 <select
-                  id="canal"
-                  name="canal"
-                  value={canal}
-                  onChange={(e) => setCanal(e.currentTarget.value)}
-                  aria-invalid={!!erros.canal}
-                  aria-describedby={erros.canal ? 'erro-canal' : undefined}
-                  className={[
-                    'min-h-11 rounded-full border bg-white px-4 text-[1rem] text-ink',
-                    erros.canal ? 'border-danger' : 'border-line',
-                  ].join(' ')}
+                  id="tipo"
+                  name="tipo"
+                  value={tipo}
+                  onChange={(e) => setTipo(e.currentTarget.value as TipoAnalise)}
+                  className="min-h-11 max-w-full rounded-full border border-line bg-white px-4 text-[1rem] text-ink"
                 >
-                  <option value="">Escolha o canal</option>
-                  {canais.map((c) => (
-                    <option key={c}>{c}</option>
+                  {tipos.map((t) => (
+                    <option key={t.valor} value={t.valor}>
+                      {t.label}
+                    </option>
                   ))}
                 </select>
-                <MsgErro id="erro-canal" texto={erros.canal} />
               </div>
 
               <div className="flex items-end gap-3">
@@ -249,7 +262,9 @@ export default function Analisar() {
                   rows={3}
                   maxLength={MAX}
                   value={rascunho}
-                  placeholder="Cole a mensagem aqui, com o link e tudo…"
+                  placeholder={
+                    tipo === 'LINK' ? 'Cole o link aqui…' : 'Cole a mensagem aqui, com o link e tudo…'
+                  }
                   onChange={(e) => setRascunho(e.currentTarget.value)}
                   onKeyDown={aoTeclar}
                   aria-invalid={!!erros.mensagem}
@@ -301,12 +316,6 @@ export default function Analisar() {
               </div>
             </form>
           </div>
-
-          {modoDemonstracao() && (
-            <p className="text-[.95rem] text-muted">
-              Demonstração: a API de decisão ainda não está ligada, então a nota sai de uma regra
-              local e as análises ficam só neste navegador.
-            </p>
           )}
         </div>
       </section>
