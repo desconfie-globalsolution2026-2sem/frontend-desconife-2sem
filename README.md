@@ -10,6 +10,8 @@ O **Desconfie** é o front-end da solução desenvolvida para a **Global Solutio
 
 **O problema:** golpes por SMS, WhatsApp e e-mail ("oi mãe, troquei de número", falso boleto, link que imita o banco) fazem vítimas todos os dias. Quem cai costuma ser quem tem menos acesso a informação para desconfiar.
 
+**Objetivo:** ajudar o cidadão comum, em especial quem tem pouca familiaridade com tecnologia, a descobrir se uma mensagem é golpe **antes** de clicar, pagar ou passar dados, e ensinar a reconhecer os sinais para a próxima vez.
+
 **A solução:** uma SPA em que a pessoa cola o que recebeu e, em segundos, recebe um veredito (**Muito provável golpe**, **Suspeito** ou **Sem sinais de golpe**), com uma nota de 0 a 100, o que pesou na decisão e a orientação do que fazer. A análise é feita pela **API REST em Java** da disciplina de Domain Driven Design, que combina um motor de regras com um modelo de IA. O resultado fica salvo na conta e pode ser compartilhado com um **círculo de confiança** (familiares que recebem alerta quando alguém do círculo recebe um golpe).
 
 O site foi construído com **React, TypeScript, Vite e Tailwind CSS**, com roteamento via **React Router**, requisições com **Fetch API** e sem bibliotecas de UI prontas.
@@ -28,6 +30,7 @@ O site foi construído com **React, TypeScript, Vite e Tailwind CSS**, com rotea
 - **Minhas análises** com o histórico do usuário, filtro por veredito, detalhe e exclusão
 - **Página da análise** em rota dinâmica (`/analises/:id`)
 - **Círculo de confiança**: guardião, dependentes, alertas e análises do círculo
+- **Minha conta**: editar nome, e-mail e telefone, excluir a conta e cadastrar as **regras de detecção** (categorias de golpe e padrões, com ativar, desativar e excluir)
 - **Menu mobile** com botão de abrir e fechar
 - **Página 404** para endereços que não existem
 - **Design responsivo** para mobile (390 × 844), tablet (768 × 1024) e desktop (1440 × 900)

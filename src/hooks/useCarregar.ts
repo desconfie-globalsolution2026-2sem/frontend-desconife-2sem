@@ -15,15 +15,16 @@ export function useCarregar<T>(buscar: () => Promise<T>, chave: unknown) {
   const [tentativa, setTentativa] = useState(0)
 
   /* 'buscar' nasce nova a cada render. Como Effect Event, o efeito chama sempre
-     a versao mais recente sem depender dela: quem decide quando rebuscar e a
-     'chave' (e o "tentar de novo"). */
-  const executarBusca = useEffectEvent(() => buscar())
+     a versao mais recente sem depender dela. Quem decide quando rebuscar e a
+     'chave' e o "tentar de novo" ('tentativa'): por isso o efeito passa os dois
+     para a busca, deixando claro que sao eles os gatilhos. */
+  const executarBusca = useEffectEvent((_chave: unknown, _tentativa: number) => buscar())
 
   /* O estado so muda depois do await, e 'ativo' impede setState depois de a
      tela sair do ar. */
   useEffect(() => {
     let ativo = true
-    executarBusca()
+    executarBusca(chave, tentativa)
       .then((resultado) => {
         if (!ativo) return
         setDados(resultado)
