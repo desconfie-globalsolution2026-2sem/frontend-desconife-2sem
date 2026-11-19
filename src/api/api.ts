@@ -5,20 +5,6 @@
 
 const BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
 
-/*
- * Caminhos do servico antigo de analise, que ainda roda no mock. Saem quando a
- * tela de analisar passar a falar com a API.
- */
-export const endpoints = {
-  criarAnalise: '',
-  listarAnalises: '',
-  enviarFeedback: '',
-}
-
-export function endpointDefinido(caminho: string) {
-  return caminho.trim() !== ''
-}
-
 export class ErroApi extends Error {
   status: number
   constructor(status: number, mensagem: string) {
