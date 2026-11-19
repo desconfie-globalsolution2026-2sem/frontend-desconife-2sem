@@ -166,7 +166,7 @@ desconfie-front-end/
 - **Deploy (Vercel):** https://desconfie-eight.vercel.app
 - **API (Java/DDD) publicada:** https://java-desconfie-api.onrender.com
 - **Documentação da API (Swagger):** https://java-desconfie-api.onrender.com/swagger-ui/index.html
-- **Vídeo de apresentação (YouTube):** _em breve_
+- **Vídeo de apresentação (YouTube):** https://youtu.be/imekWGyVqMo
 
 > A API está no plano gratuito do Render, que desliga o serviço quando fica parado. A primeira requisição do dia pode levar até um minuto.
 
@@ -225,7 +225,7 @@ npm run lint      # roda o linter (Oxlint)
 
 Apresentação das páginas, do fluxo de análise e da integração com a API Java (até 3 minutos):
 
-> **Link:** _em breve_
+> **Link:** https://youtu.be/imekWGyVqMo
 
 ---
 
