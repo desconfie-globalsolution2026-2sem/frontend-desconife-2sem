@@ -219,7 +219,7 @@ npm run lint      # roda o linter (Oxlint)
 
 ## 🎥 Vídeo de Apresentação
 
-Demonstração das páginas, do fluxo de análise e da integração com a API Java (até 3 minutos):
+Apresentação das páginas, do fluxo de análise e da integração com a API Java (até 3 minutos):
 
 > **Link:** _em breve_
 

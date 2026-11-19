@@ -161,8 +161,7 @@ export default function Contato() {
 
             {sucesso && (
               <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
-                <strong className="text-safe">Mensagem registrada nesta demonstração.</strong> No
-                site final, ela vai para a equipe pela API do Desconfie.
+                <strong className="text-safe">Mensagem enviada.</strong> Obrigado pelo contato!
               </p>
             )}
 
