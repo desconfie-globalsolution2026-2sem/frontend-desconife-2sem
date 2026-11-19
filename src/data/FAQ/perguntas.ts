@@ -12,7 +12,7 @@ export const grupos: GrupoFaq[] = [
       {
         pergunta: 'Preciso criar conta?',
         resposta:
-          'Não. Você pode analisar de forma anônima. Com cadastro, você ganha o histórico das suas análises.',
+          'Sim. A conta é grátis e leva menos de um minuto. É nela que ficam o histórico das suas análises e o círculo de confiança, que avisa sua família quando chega um golpe.',
       },
       {
         pergunta: 'Como copio uma mensagem do WhatsApp?',

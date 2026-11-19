@@ -7,13 +7,15 @@ const h2 = 'text-[clamp(1.8rem,3.4vw,2.6rem)] font-bold'
 const lead = 'max-w-[58ch] text-[clamp(1.15rem,1.8vw,1.35rem)] leading-[1.5] text-muted'
 const wrap = 'mx-auto max-w-[1080px] px-5'
 
-const formula = `nota_ia    = maior(prob_texto, prob_link)
-nota_final = 0,6 × nota_ia + 0,4 × mín(1, soma dos pesos)
+const formula = `nota_regras = soma dos pesos dos padrões (máx. 100)
+nota_ia     = chance de golpe do modelo × 100
+nota_final  = (nota_regras + nota_ia) ÷ 2
+              sem IA no ar, vale só nota_regras
 
-sinal crítico      → muito provável golpe
-nota_final ≥ 0,70  → muito provável golpe
-nota_final ≥ 0,40  → suspeito
-abaixo disso       → sem sinais de golpe`
+nota_final ≥ 60  → muito provável golpe
+nota_final ≥ 30  → suspeito
+abaixo de 30     → sem sinais de golpe
+site oficial     → nota limitada a 29`
 
 export default function Sobre() {
   return (
@@ -25,8 +27,8 @@ export default function Sobre() {
           Como uma mensagem vira um veredito
         </h1>
         <p className={`${lead} mt-4.5`}>
-          Quatro partes trabalham juntas. A IA dá uma probabilidade, as regras conferem, e você
-          recebe a resposta com os motivos.
+          Quatro partes trabalham juntas. As regras e a IA dão uma nota cada, o Java junta as
+          duas, e você recebe a resposta com os motivos.
         </p>
       </div>
 
@@ -62,8 +64,10 @@ export default function Sobre() {
             ))}
           </ol>
           <p className="mt-4 max-w-[70ch] text-[.95rem] text-muted">
-            O caminho é esse, na ordem: o site envia, o Python prepara e pontua, e o Java fecha a
-            conta e devolve o veredito para a tela.
+            Na ordem: o site envia para o Java. O Java confere as regras e pede a nota ao Python.
+            Com as duas notas, decide o veredito, grava no Oracle e devolve para a tela. Se for
+            vermelho, avisa quem está no seu círculo de confiança. Se a IA estiver fora do ar, a
+            análise sai só com as regras.
           </p>
         </div>
       </section>
@@ -78,11 +82,12 @@ export default function Sobre() {
             </h2>
             <p className="text-muted">
               Modelo de IA erra, e numa questão de dinheiro o erro custa caro. Por isso a decisão
-              final é da API Java, que soma a opinião dos modelos com o peso dos sinais encontrados.
+              final é da API Java, que tira a média entre a nota do modelo e a nota das regras.
             </p>
             <p className="text-muted">
-              Se aparecer um sinal crítico, como um site que imita um banco, o alerta é máximo
-              independentemente da nota. Assim cada veredito pode ser explicado e auditado.
+              Cada padrão encontrado soma o seu peso uma vez só, e um link do site oficial de uma
+              empresa (como itau.com.br) nunca passa de 29. Como a tela mostra o que pesou, cada
+              veredito pode ser explicado e auditado.
             </p>
           </div>
 
@@ -169,9 +174,10 @@ export default function Sobre() {
             <p className={eyebrow}>Privacidade</p>
             <h2 className={h2}>O que fazemos com o que você cola</h2>
             <p className="text-muted">
-              Antes de salvar, trocamos CPF, telefone e e-mail por marcadores como [CPF]. A análise
-              pode ser anônima, sem cadastro. O texto mascarado serve para mostrar seu histórico e,
-              com o seu "era golpe" ou "não era", para melhorar os modelos.
+              Antes de a mensagem sair do navegador, trocamos CPF, telefone, e-mail e cartão por
+              marcadores como [CPF]. A análise fica guardada na sua conta. O texto mascarado serve
+              para mostrar seu histórico, avisar o seu círculo e, com o seu "era golpe" ou "não
+              era", melhorar os modelos.
             </p>
           </div>
           <div className="grid max-w-[65ch] content-start gap-4">
