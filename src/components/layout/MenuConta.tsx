@@ -11,7 +11,7 @@ const itemMenu =
 
 /*
  * Ponta direita do header: "Entrar" para quem nao esta logado; logado, o
- * primeiro nome, que abre um menu com as analises e o sair.
+ * primeiro nome, que abre um menu com o circulo e o sair.
  *
  * O menu usa a Popover API do navegador: fechar ao clicar fora e no Esc vem
  * de graca, sem estado nem listener.
@@ -55,6 +55,9 @@ export default function MenuConta() {
           <p className="truncate text-[.88rem] text-muted">{usuario.email}</p>
         </div>
         <div className="my-1 h-px bg-black/10" />
+        <Link to="/circulo" onClick={fechar} className={`${itemMenu} text-ink`}>
+          Círculo de confiança
+        </Link>
         <Link to="/minhas-analises" onClick={fechar} className={`${itemMenu} text-ink`}>
           Minhas análises
         </Link>

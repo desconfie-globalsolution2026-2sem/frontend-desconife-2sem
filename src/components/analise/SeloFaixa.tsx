@@ -1,7 +1,7 @@
 import { faixas } from '../../data/Analise/faixas'
 import type { Risco } from '../../types/Api/dtos'
 
-/* Selo colorido com o nome do veredito. Usado no historico e no detalhe. */
+/* Selo colorido com o nome do veredito. Usado no resultado e no historico. */
 export default function SeloFaixa({ risco }: { risco: Risco }) {
   const info = faixas[risco]
   return (
