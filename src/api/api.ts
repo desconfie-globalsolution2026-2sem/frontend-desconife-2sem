@@ -1,21 +1,17 @@
 /*
  * Camada de rede. Toda chamada do site passa por aqui.
- *
- * Os caminhos ficam em um objeto so para nao espalhar string de URL pelas
- * telas: quando a API Java definir os endpoints, muda neste arquivo e pronto.
- *
- * Enquanto um caminho estiver vazio, o service correspondente usa o mock local
- * (src/api/mockAnalises.ts), para a tela continuar demonstravel.
+ * Os caminhos de cada recurso ficam em src/api/endpoints.
  */
 
 const BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
 
+/*
+ * Caminhos do servico antigo de analise, que ainda roda no mock. Saem quando a
+ * tela de analisar passar a falar com a API.
+ */
 export const endpoints = {
-  /* POST: recebe { canal, mensagem }, devolve a Analise com nota e sinais. */
   criarAnalise: '',
-  /* GET: devolve a lista de Analise do usuario logado, mais recente primeiro. */
   listarAnalises: '',
-  /* POST: feedback do usuario sobre um veredito. Ainda nao usado nas telas. */
   enviarFeedback: '',
 }
 
@@ -31,6 +27,13 @@ export class ErroApi extends Error {
   }
 }
 
+/* Texto para mostrar na tela: o que a API explicou ou, se nem chegou nela, um aviso geral. */
+export function mensagemDeErro(erro: unknown) {
+  return erro instanceof ErroApi
+    ? erro.message
+    : 'Não conseguimos falar com o Desconfie agora. Tente de novo em instantes.'
+}
+
 export async function requisicao<T>(caminho: string, opcoes: RequestInit = {}): Promise<T> {
   const resposta = await fetch(`${BASE}${caminho}`, {
     ...opcoes,
@@ -40,9 +43,27 @@ export async function requisicao<T>(caminho: string, opcoes: RequestInit = {}): 
     },
   })
 
+  /* DELETE e alguns PATCH voltam sem corpo. */
+  const texto = await resposta.text()
+  const corpo = texto ? JSON.parse(texto) : undefined
+
   if (!resposta.ok) {
-    throw new ErroApi(resposta.status, `A API respondeu ${resposta.status}.`)
+    /* A API manda { status, erro, mensagem, campos } em todo erro. */
+    throw new ErroApi(resposta.status, corpo?.mensagem ?? `A API respondeu ${resposta.status}.`)
   }
 
-  return (await resposta.json()) as T
+  return corpo as T
 }
+
+/* Atalhos por metodo HTTP, usados pelos arquivos de src/api/endpoints. */
+export const get = <T>(caminho: string) => requisicao<T>(caminho)
+
+export const post = <T>(caminho: string, dados?: unknown) =>
+  requisicao<T>(caminho, { method: 'POST', body: JSON.stringify(dados) })
+
+export const put = <T>(caminho: string, dados: unknown) =>
+  requisicao<T>(caminho, { method: 'PUT', body: JSON.stringify(dados) })
+
+export const patch = <T>(caminho: string) => requisicao<T>(caminho, { method: 'PATCH' })
+
+export const del = (caminho: string) => requisicao<void>(caminho, { method: 'DELETE' })
