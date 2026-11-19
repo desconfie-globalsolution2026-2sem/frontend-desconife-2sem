@@ -11,6 +11,8 @@ import type { UsuarioResponse } from '../types/Api/dtos'
 export interface Sessao {
   usuario: UsuarioResponse | null
   entrar: (usuario: UsuarioResponse, lembrar?: boolean) => void
+  /* Troca os dados guardados (ex.: depois de editar a conta) sem mudar o "manter conectado". */
+  atualizar: (usuario: UsuarioResponse) => void
   sair: () => void
 }
 
@@ -34,6 +36,15 @@ export function gravarUsuario(usuario: UsuarioResponse, lembrar: boolean) {
     ;(lembrar ? localStorage : sessionStorage).setItem(CHAVE, JSON.stringify(usuario))
   } catch {
     /* segue logado so nesta aba */
+  }
+}
+
+/* true se a sessao atual foi gravada com "manter conectado". */
+export function estaLembrado() {
+  try {
+    return localStorage.getItem(CHAVE) !== null
+  } catch {
+    return false
   }
 }
 
