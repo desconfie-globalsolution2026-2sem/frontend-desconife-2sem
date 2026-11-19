@@ -1,0 +1,11 @@
+Desconfie · Global Solution 2026/2 · Front-End Design Engineering
+
+RM570636 · Pedro Amaro Pires · 1TDSPW
+RM571985 · Lucas Leite Carlos · 1TDSPJ
+RM573469 · Juan Souza Marques · 1TDSPJ
+RM570017 · Matheus Matsushita de Souza · 1TDSPJ
+
+Links:
+- Repositório: https://github.com/desconfie-globalsolution2026-2sem/frontend-desconife-2sem
+- Site (Vercel): https://desconfie-eight.vercel.app
+- API Java: https://java-desconfie-api.onrender.com

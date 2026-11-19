@@ -206,7 +206,7 @@ npm run lint      # roda o linter (Oxlint)
 
 | Foto | Nome | RM | Turma | GitHub | LinkedIn |
 |---|---|---|---|---|---|
-| <img src="./src/assets/foto-pedro.jpeg" width="80" alt="Pedro" /> | **Pedro Amaro Pires** | RM570636 | 1TDSPJ | [pedroamarop](https://github.com/pedroamarop) | [pedro-amaro-pires](https://www.linkedin.com/in/pedro-amaro-pires) |
+| <img src="./src/assets/foto-pedro.jpeg" width="80" alt="Pedro" /> | **Pedro Amaro Pires** | RM570636 | 1TDSPW | [pedroamarop](https://github.com/pedroamarop) | [pedro-amaro-pires](https://www.linkedin.com/in/pedro-amaro-pires) |
 | <img src="./src/assets/foto-juan.jpeg" width="80" alt="Juan" /> | **Juan Souza Marques** | RM573469 | 1TDSPJ | [juansouzamarques](https://github.com/juansouzamarques) | [juan-marques](https://www.linkedin.com/in/juan-marques-297b293b4/) |
 | <img src="./src/assets/foto-lucas.jpeg" width="80" alt="Lucas" /> | **Lucas Leite Carlos** | RM571985 | 1TDSPJ | [Leite-1309](https://github.com/Leite-1309) | [lucas-leite-carlos](https://www.linkedin.com/in/lucas-leite-carlos-5b72973a9/) |
 | <img src="./src/assets/foto-matheus.jpeg" width="80" alt="Matheus" /> | **Matheus Matsushita de Souza** | RM570017 | 1TDSPJ | [Matsushita1907](https://github.com/Matsushita1907) | [matheus-matsushita](https://www.linkedin.com/in/matheus-matsushita-de-souza-543269346/) |
