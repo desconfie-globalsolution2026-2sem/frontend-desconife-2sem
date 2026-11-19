@@ -1,66 +1,33 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import { mensagemDeErro } from '../../api/api'
+import { buscarAnalise, excluirAnalise, listarAnalisesDoUsuario } from '../../api/endpoints/analises'
 import Button from '../../components/button/Button'
+import CardVeredito from '../../components/analise/CardVeredito'
+import Feedback from '../../components/analise/Feedback'
 import SeloFaixa from '../../components/analise/SeloFaixa'
-import { apagarAnalises, listarAnalises, modoDemonstracao } from '../../api/analises'
-import type { Analise, Faixa } from '../../types/Analise/analise'
-import { dataHoraBr, notaBr, pesoBr } from '../../utils/formatar'
+import EstadoCarga from '../../components/layout/EstadoCarga'
+import PedirLogin from '../../components/layout/PedirLogin'
+import { rotuloDoTipo } from '../../data/Analise/tipos'
+import { useCarregar } from '../../hooks/useCarregar'
+import { useSessao } from '../../hooks/useSessao'
+import type { AnaliseResponse, Risco } from '../../types/Api/dtos'
+import { dataHoraBr, notaBr } from '../../utils/formatar'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
 const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
 
-/* 'todas' nao e uma faixa da API: e so a opcao do filtro desta tela. */
-type Filtro = Faixa | 'todas'
+/* 'todas' nao e um risco da API: e so a opcao do filtro desta tela. */
+type Filtro = Risco | 'todas'
 
 const filtros: { valor: Filtro; label: string }[] = [
   { valor: 'todas', label: 'Todas' },
-  { valor: 'golpe', label: 'Muito provável golpe' },
-  { valor: 'suspeito', label: 'Suspeito' },
-  { valor: 'seguro', label: 'Sem sinais' },
+  { valor: 'VERMELHO', label: 'Muito provável golpe' },
+  { valor: 'AMARELO', label: 'Suspeito' },
+  { valor: 'VERDE', label: 'Sem sinais' },
 ]
 
 export default function MinhasAnalises() {
-  const [analises, setAnalises] = useState<Analise[]>([])
-  const [carregando, setCarregando] = useState(true)
-  const [erro, setErro] = useState('')
-  const [filtro, setFiltro] = useState<Filtro>('todas')
-  /* Id da analise aberta. Uma por vez, para a lista nao virar uma parede de texto. */
-  const [aberta, setAberta] = useState<string | null>(null)
-
-  const MSG_ERRO = 'Não conseguimos carregar suas análises agora.'
-
-  /* Busca na montagem. O estado so muda depois do await, nunca no corpo do
-     efeito, e 'ativo' impede setState depois de a tela sair do ar. */
-  useEffect(() => {
-    let ativo = true
-    listarAnalises()
-      .then((lista) => ativo && setAnalises(lista))
-      .catch(() => ativo && setErro(MSG_ERRO))
-      .finally(() => ativo && setCarregando(false))
-    return () => {
-      ativo = false
-    }
-  }, [])
-
-  /* Recarga pedida pelo usuario: botao de tentar de novo e depois de apagar. */
-  async function recarregar() {
-    setCarregando(true)
-    setErro('')
-    try {
-      setAnalises(await listarAnalises())
-    } catch {
-      setErro(MSG_ERRO)
-    } finally {
-      setCarregando(false)
-    }
-  }
-
-  async function aoApagar() {
-    if (!confirm('Apagar todas as análises deste navegador?')) return
-    await apagarAnalises()
-    await recarregar()
-  }
-
-  const lista = filtro === 'todas' ? analises : analises.filter((a) => a.faixa === filtro)
+  const { usuario } = useSessao()
 
   return (
     <main>
@@ -77,141 +44,166 @@ export default function MinhasAnalises() {
 
       <section className="pb-18">
         <div className={`${wrap} grid gap-6`}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            {/* Grupo de filtro: um botao por faixa, com aria-pressed dizendo qual esta ativo. */}
-            <div role="group" aria-label="Filtrar por veredito" className="flex flex-wrap gap-1.5">
-              {filtros.map((f) => {
-                const ativo = filtro === f.valor
-                return (
-                  <button
-                    key={f.valor}
-                    type="button"
-                    aria-pressed={ativo}
-                    onClick={() => setFiltro(f.valor)}
-                    className={[
-                      'flex min-h-11 items-center rounded-full px-4 text-[.95rem] transition-colors',
-                      ativo
-                        ? 'bg-navy font-semibold text-white'
-                        : 'bg-surface font-medium text-muted hover:text-navy',
-                    ].join(' ')}
-                  >
-                    {f.label}
-                  </button>
-                )
-              })}
-            </div>
-
-            <Button to="/analisar">Analisar outra mensagem</Button>
-          </div>
-
-          {carregando && (
-            <p role="status" className="rounded-2xl bg-surface p-5 text-muted">
-              Carregando suas análises…
-            </p>
-          )}
-
-          {erro && (
-            <div role="alert" className="grid justify-items-start gap-3 rounded-2xl bg-danger-bg p-5">
-              <p className="text-ink">
-                <strong className="text-danger">Deu erro.</strong> {erro}
-              </p>
-              <Button type="button" onClick={() => void recarregar()}>
-                Tentar de novo
-              </Button>
-            </div>
-          )}
-
-          {!carregando && !erro && lista.length === 0 && (
-            <div className="grid justify-items-start gap-4 rounded-[28px] border border-line p-7">
-              <h2 className="text-[1.4rem] font-semibold">
-                {analises.length === 0 ? 'Nada analisado ainda' : 'Nenhuma análise nesse veredito'}
-              </h2>
-              <p className="max-w-[52ch] text-muted">
-                {analises.length === 0
-                  ? 'Quando você mandar uma mensagem para análise, ela aparece aqui com o veredito.'
-                  : 'Troque o filtro acima para ver as outras análises.'}
-              </p>
-              {analises.length === 0 && <Button to="/analisar">Analisar uma mensagem</Button>}
-            </div>
-          )}
-
-          {lista.length > 0 && (
-            <ul className="grid list-none gap-3 p-0">
-              {lista.map((a) => {
-                const expandida = aberta === a.id
-                return (
-                  <li key={a.id} className="rounded-[20px] bg-surface p-5">
-                    <div className="flex flex-wrap items-center gap-3">
-                      <SeloFaixa faixa={a.faixa} />
-                      <span className="font-mono text-[.95rem] text-muted">
-                        nota {notaBr(a.nota)}
-                      </span>
-                      <span className="text-[.95rem] text-muted">
-                        {a.canal} · {dataHoraBr(a.criadoEm)}
-                      </span>
-                    </div>
-
-                    <p
-                      className={[
-                        'mt-3 text-[1.02rem] text-ink',
-                        /* Fechada, a mensagem fica em duas linhas; aberta, inteira. */
-                        expandida ? '' : 'line-clamp-2',
-                      ].join(' ')}
-                    >
-                      {a.mensagem}
-                    </p>
-
-                    {expandida && (
-                      <div className="mt-4">
-                        <h3 className="text-[1.02rem] font-semibold">Sinais encontrados</h3>
-                        {a.sinais.length > 0 ? (
-                          <ul className="mt-2 grid list-none gap-2 p-0">
-                            {a.sinais.map((s) => (
-                              <li
-                                key={s.codigo}
-                                className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white px-4 py-2.5"
-                              >
-                                <span className="font-medium">{s.nome}</span>
-                                <span className="font-mono text-[.92rem] text-muted">
-                                  {s.critico ? 'crítico' : pesoBr(s.peso)}
-                                </span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p className="mt-1 text-[.98rem] text-muted">
-                            Nenhum sinal de golpe nesta mensagem.
-                          </p>
-                        )}
-                      </div>
-                    )}
-
-                    <button
-                      type="button"
-                      aria-expanded={expandida}
-                      onClick={() => setAberta(expandida ? null : a.id)}
-                      className="mt-3 flex min-h-11 items-center text-[.95rem] font-semibold text-navy"
-                    >
-                      {expandida ? 'Fechar detalhes' : 'Ver detalhes'}
-                    </button>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-
-          {modoDemonstracao() && analises.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-4 border-t border-line pt-5">
-              <p className="text-[.95rem] text-muted">
-                Demonstração: estas análises estão salvas só neste navegador.
-              </p>
-              <Button variante="secundario" type="button" onClick={() => void aoApagar()}>
-                Apagar tudo
-              </Button>
-            </div>
+          {usuario ? (
+            <Historico usuarioId={usuario.id} />
+          ) : (
+            <PedirLogin texto="Suas análises ficam guardadas na sua conta. Entre para ver o histórico." />
           )}
         </div>
       </section>
     </main>
+  )
+}
+
+function Historico({ usuarioId }: { usuarioId: number }) {
+  const { dados, setDados, carregando, erro, recarregar } = useCarregar(
+    () => listarAnalisesDoUsuario(usuarioId),
+    usuarioId,
+  )
+  const [erroAcao, setErroAcao] = useState('')
+  const [filtro, setFiltro] = useState<Filtro>('todas')
+  /* Id da analise aberta. Uma por vez, para a lista nao virar uma parede de texto. */
+  const [aberta, setAberta] = useState<number | null>(null)
+  /* A lista so traz o resumo; o detalhe e buscado ao abrir e fica guardado aqui. */
+  const [detalhes, setDetalhes] = useState<Record<number, AnaliseResponse>>({})
+
+  const analises = dados ?? []
+  const lista = filtro === 'todas' ? analises : analises.filter((a) => a.risco === filtro)
+
+  const guardarDetalhe = (analise: AnaliseResponse) =>
+    setDetalhes((atuais) => ({ ...atuais, [analise.id]: analise }))
+
+  async function alternar(id: number) {
+    if (aberta === id) return setAberta(null)
+    setAberta(id)
+    if (detalhes[id]) return
+    try {
+      guardarDetalhe(await buscarAnalise(id))
+    } catch (e) {
+      setErroAcao(mensagemDeErro(e))
+    }
+  }
+
+  async function aoApagar(id: number) {
+    if (!confirm('Apagar esta análise?')) return
+    try {
+      await excluirAnalise(id)
+      setDados((atuais) => atuais?.filter((a) => a.id !== id))
+      setAberta(null)
+    } catch (e) {
+      setErroAcao(mensagemDeErro(e))
+    }
+  }
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Grupo de filtro: um botao por risco, com aria-pressed dizendo qual esta ativo. */}
+        <div role="group" aria-label="Filtrar por veredito" className="flex flex-wrap gap-1.5">
+          {filtros.map((f) => {
+            const ativo = filtro === f.valor
+            return (
+              <button
+                key={f.valor}
+                type="button"
+                aria-pressed={ativo}
+                onClick={() => setFiltro(f.valor)}
+                className={[
+                  'flex min-h-11 items-center rounded-full px-4 text-[.95rem] transition-colors',
+                  ativo ? 'bg-navy font-semibold text-white' : 'bg-surface font-medium text-muted hover:text-navy',
+                ].join(' ')}
+              >
+                {f.label}
+              </button>
+            )
+          })}
+        </div>
+
+        <Button to="/analisar">Analisar outra mensagem</Button>
+      </div>
+
+      <EstadoCarga
+        carregando={carregando}
+        erro={erro}
+        recarregar={recarregar}
+        texto="Carregando suas análises…"
+      />
+      {erroAcao && (
+        <p role="alert" className="rounded-2xl bg-danger-bg p-4 text-ink">
+          {erroAcao}
+        </p>
+      )}
+
+      {dados && lista.length === 0 && (
+        <div className="grid justify-items-start gap-4 rounded-[28px] border border-line p-7">
+          <h2 className="text-[1.4rem] font-semibold">
+            {analises.length === 0 ? 'Nada analisado ainda' : 'Nenhuma análise nesse veredito'}
+          </h2>
+          <p className="max-w-[52ch] text-muted">
+            {analises.length === 0
+              ? 'Quando você mandar uma mensagem para análise, ela aparece aqui com o veredito.'
+              : 'Troque o filtro acima para ver as outras análises.'}
+          </p>
+          {analises.length === 0 && <Button to="/analisar">Analisar uma mensagem</Button>}
+        </div>
+      )}
+
+      {lista.length > 0 && (
+        <ul className="grid list-none gap-3 p-0">
+          {lista.map((a) => {
+            const expandida = aberta === a.id
+            const detalhe = detalhes[a.id]
+            return (
+              <li key={a.id} className="rounded-[20px] bg-surface p-5">
+                <div className="flex flex-wrap items-center gap-3">
+                  <SeloFaixa risco={a.risco} />
+                  <span className="font-mono text-[.95rem] text-muted">nota {notaBr(a.notaFinal)}</span>
+                  <span className="text-[.95rem] text-muted">
+                    {rotuloDoTipo(a.tipo)} · {dataHoraBr(a.dataAnalise)}
+                  </span>
+                </div>
+
+                <p className="mt-3 text-[1.02rem] text-ink">
+                  {a.categoriaPrincipal ?? 'Nenhuma categoria de golpe identificada'}
+                </p>
+
+                {expandida && (
+                  <div className="mt-4 grid gap-4">
+                    {detalhe ? (
+                      <>
+                        <p className="whitespace-pre-wrap rounded-xl bg-white px-4 py-3 text-[1.02rem]">
+                          {detalhe.conteudo}
+                        </p>
+                        <CardVeredito analise={detalhe} />
+                        <Feedback analise={detalhe} aoResponder={guardarDetalhe} />
+                        <Button
+                          variante="secundario"
+                          type="button"
+                          onClick={() => void aoApagar(a.id)}
+                          className="justify-self-start"
+                        >
+                          Apagar esta análise
+                        </Button>
+                      </>
+                    ) : (
+                      <p className="text-muted">Carregando detalhes…</p>
+                    )}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  aria-expanded={expandida}
+                  onClick={() => void alternar(a.id)}
+                  className="mt-3 flex min-h-11 items-center text-[.95rem] font-semibold text-navy"
+                >
+                  {expandida ? 'Fechar detalhes' : 'Ver detalhes'}
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
+    </>
   )
 }

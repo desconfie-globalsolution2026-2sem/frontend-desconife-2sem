@@ -1,12 +1,12 @@
 /* Formatacao para pt-BR. Fica fora das telas para nota e data saírem iguais em
    todas elas. */
 
-/* 0.82 -> "0,82" */
+/* A API da a nota de 0 a 100. 79.4 -> "79,4" */
 export function notaBr(nota: number) {
-  return nota.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  return nota.toLocaleString('pt-BR', { maximumFractionDigits: 1 })
 }
 
-/* 0.25 -> "+0,25", igual a tabela de sinais da Home. */
+/* Quanto um sinal somou na nota. 35 -> "+35" */
 export function pesoBr(peso: number) {
   return `+${notaBr(peso)}`
 }
