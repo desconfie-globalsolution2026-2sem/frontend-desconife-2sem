@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom'
 import Logo from '../../assets/favicon.svg'
 
 const links = [
-  { path: '/quem-somos', label: 'Quem somos' },
+  { path: '/integrantes', label: 'Integrantes' },
   { path: '/sobre', label: 'Sobre' },
   { path: '/faq', label: 'Perguntas' },
   { path: '/contato', label: 'Contato' },
