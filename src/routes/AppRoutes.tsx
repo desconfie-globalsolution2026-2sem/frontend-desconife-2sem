@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom";
 import Layout from '../components/layout/Layout.tsx';
 import Analisar from '../pages/Analisar/Analisar.tsx';
 import Cadastro from '../pages/Cadastro/Cadastro.tsx';
+import Circulo from '../pages/Circulo/Circulo.tsx';
 import Contato from '../pages/Contato/Contato.tsx';
 import Entrar from '../pages/Entrar/Entrar.tsx';
 import FAQ from '../pages/FAQ/FAQ.tsx';
@@ -23,6 +24,7 @@ export default function AppRoutes() {
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/analisar" element={<Analisar />} />
             <Route path="/minhas-analises" element={<MinhasAnalises />} />
+            <Route path="/circulo" element={<Circulo />} />
         </Route>
     </Routes>
   )
