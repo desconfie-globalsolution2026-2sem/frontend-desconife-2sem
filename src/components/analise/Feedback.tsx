@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { mensagemDeErro } from '../../api/api'
-import { enviarFeedback } from '../../api/endpoints/analises'
+import { mensagemDeErro } from '../../services/api'
+import { enviarFeedback } from '../../services/endpoints/analises'
 import type { AnaliseResponse, Feedback as TipoFeedback } from '../../types/Api/dtos'
 
 const respostas: { valor: TipoFeedback; label: string; agradecimento: string }[] = [

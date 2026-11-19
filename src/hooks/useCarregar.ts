@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { mensagemDeErro } from '../api/api'
+import { mensagemDeErro } from '../services/api'
 
 /*
  * Busca dados da API quando a tela abre (e de novo se 'chave' mudar).

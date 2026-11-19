@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { mensagemDeErro } from '../api/api'
+import { mensagemDeErro } from '../services/api'
 
 /*
  * Estado compartilhado pelos formularios do site.

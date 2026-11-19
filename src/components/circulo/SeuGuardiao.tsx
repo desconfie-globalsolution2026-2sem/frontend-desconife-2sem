@@ -1,4 +1,4 @@
-import { buscarGuardiao } from '../../api/endpoints/usuarios'
+import { buscarGuardiao } from '../../services/endpoints/usuarios'
 import { useCarregar } from '../../hooks/useCarregar'
 import type { UsuarioResponse } from '../../types/Api/dtos'
 import { dataBr } from '../../utils/formatar'

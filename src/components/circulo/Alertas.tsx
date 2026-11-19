@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { mensagemDeErro } from '../../api/api'
-import { listarAlertas, marcarAlertaComoLido } from '../../api/endpoints/alertas'
+import { mensagemDeErro } from '../../services/api'
+import { listarAlertas, marcarAlertaComoLido } from '../../services/endpoints/alertas'
 import { useCarregar } from '../../hooks/useCarregar'
 import { dataHoraBr, notaBr } from '../../utils/formatar'
 import SeloFaixa from '../analise/SeloFaixa'

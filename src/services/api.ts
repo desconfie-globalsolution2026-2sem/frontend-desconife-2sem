@@ -1,6 +1,6 @@
 /*
  * Camada de rede. Toda chamada do site passa por aqui.
- * Os caminhos de cada recurso ficam em src/api/endpoints.
+ * Os caminhos de cada recurso ficam em src/services/endpoints.
  */
 
 const BASE = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '')
@@ -41,7 +41,7 @@ export async function requisicao<T>(caminho: string, opcoes: RequestInit = {}): 
   return corpo as T
 }
 
-/* Atalhos por metodo HTTP, usados pelos arquivos de src/api/endpoints. */
+/* Atalhos por metodo HTTP, usados pelos arquivos de src/services/endpoints. */
 export const get = <T>(caminho: string) => requisicao<T>(caminho)
 
 export const post = <T>(caminho: string, dados?: unknown) =>

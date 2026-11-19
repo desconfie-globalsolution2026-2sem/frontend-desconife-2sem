@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { listarPadroes } from '../api/endpoints/padroes'
+import { listarPadroes } from '../services/endpoints/padroes'
 import { sinais as sinaisFixos } from '../data/Home/sinais'
 import type { PadraoResponse } from '../types/Api/dtos'
 import type { Sinal } from '../types/Home/sinal'
