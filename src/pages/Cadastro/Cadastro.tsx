@@ -184,7 +184,7 @@ export default function Cadastro() {
             {pedidos.map((p) => (
               <li
                 key={p.termo}
-                className="grid gap-1 border-b border-line py-4 last:border-b-0 sm:grid-cols-[120px_1fr] sm:gap-4"
+                className="grid gap-1 border-b border-line py-4 last:border-b-0 sm:grid-cols-[120px_minmax(0,1fr)] sm:gap-4 md:grid-cols-1 md:gap-1 lg:grid-cols-[120px_minmax(0,1fr)] lg:gap-4"
               >
                 <b className="text-navy">{p.termo}</b>
                 <span className="text-[.98rem] text-muted">{p.texto}</span>
