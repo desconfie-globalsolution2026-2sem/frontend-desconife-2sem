@@ -1,5 +1,5 @@
 export interface Publico {
-    quem: string
-    recebe: string
-    paga: string
+  quem: string
+  recebe: string
+  paga: string
 }

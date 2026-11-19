@@ -1,4 +1,4 @@
 export interface Passo {
-    titulo: string
-    texto: string
+  titulo: string
+  texto: string
 }

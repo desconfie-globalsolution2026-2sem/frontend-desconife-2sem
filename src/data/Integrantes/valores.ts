@@ -1,6 +1,6 @@
-import type { Valores } from '../../types/Quem Somos/valores'
+import type { Valor } from '../../types/Integrantes/valor'
 
-export const valores: Valores[] = [
+export const valores: Valor[] = [
     {
         titulo: 'Explicar, não só alertar',
         texto: 'Quem entende o motivo reconhece o próximo golpe sozinho.',

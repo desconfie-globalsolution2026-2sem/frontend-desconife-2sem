@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useEffectEvent, useState } from 'react'
 import { mensagemDeErro } from '../services/api'
 
 /*
@@ -14,12 +14,16 @@ export function useCarregar<T>(buscar: () => Promise<T>, chave: unknown) {
   const [erro, setErro] = useState('')
   const [tentativa, setTentativa] = useState(0)
 
+  /* 'buscar' nasce nova a cada render. Como Effect Event, o efeito chama sempre
+     a versao mais recente sem depender dela: quem decide quando rebuscar e a
+     'chave' (e o "tentar de novo"). */
+  const executarBusca = useEffectEvent(() => buscar())
+
   /* O estado so muda depois do await, e 'ativo' impede setState depois de a
-     tela sair do ar. 'buscar' fica fora das dependencias de proposito: ela
-     nasce nova a cada render, e quem decide quando rebuscar e a 'chave'. */
+     tela sair do ar. */
   useEffect(() => {
     let ativo = true
-    buscar()
+    executarBusca()
       .then((resultado) => {
         if (!ativo) return
         setDados(resultado)
@@ -30,7 +34,6 @@ export function useCarregar<T>(buscar: () => Promise<T>, chave: unknown) {
     return () => {
       ativo = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chave, tentativa])
 
   function recarregar() {

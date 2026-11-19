@@ -127,7 +127,7 @@ desconfie-front-end/
     │
     ├── pages/                    # Uma pasta por página (padrão pages/<Nome>/<Nome>.tsx)
     │   ├── Home/
-    │   ├── QuemSomos/            # Página de integrantes
+    │   ├── Integrantes/          # Página de integrantes
     │   ├── Sobre/
     │   ├── FAQ/
     │   ├── Contato/
@@ -137,6 +137,7 @@ desconfie-front-end/
     │   ├── MinhasAnalises/       # Histórico do usuário (GET)
     │   ├── DetalheAnalise/       # Rota dinâmica /analises/:id (GET, PUT, DELETE)
     │   ├── Circulo/              # Círculo de confiança
+    │   ├── MinhaConta/           # Editar dados e excluir a conta (PUT, DELETE)
     │   └── NaoEncontrada/        # Página 404
     │
     ├── components/
@@ -148,9 +149,9 @@ desconfie-front-end/
     │
     ├── services/
     │   ├── api.ts                # Camada de rede com fetch e tratamento de erro
-    │   └── endpoints/            # Um arquivo por recurso: usuarios, analises, alertas, categorias, padroes, health
+    │   └── endpoints/            # Um arquivo por recurso: usuarios, analises, alertas, padroes, health
     │
-    ├── hooks/                    # useFormulario, useCarregar (loading/erro/dados), useSessao
+    ├── hooks/                    # useFormulario, useCarregar (loading/erro/dados), useSessao, useSinais
     ├── context/                  # Sessão do usuário logado
     ├── data/                     # Textos e listas estáticas de cada página
     ├── types/                    # Interfaces e tipos, incluindo os DTOs da API (types/Api/dtos.ts)

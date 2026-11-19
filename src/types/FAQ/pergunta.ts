@@ -1,9 +1,9 @@
 export interface Pergunta {
-    pergunta: string
-    resposta: string
+  pergunta: string
+  resposta: string
 }
 
 export interface GrupoFaq {
-    titulo: string
-    perguntas: Pergunta[]
+  titulo: string
+  perguntas: Pergunta[]
 }

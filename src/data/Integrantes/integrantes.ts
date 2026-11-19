@@ -1,4 +1,4 @@
-import type { Integrante } from '../../types/Quem Somos/team'
+import type { Integrante } from '../../types/Integrantes/integrante'
 import FotoPedro from '../../assets/foto-pedro.jpeg'
 import FotoJuan from '../../assets/foto-juan.jpeg'
 import FotoLucas from '../../assets/foto-lucas.jpeg'

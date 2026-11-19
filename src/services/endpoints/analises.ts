@@ -18,8 +18,6 @@ export const listarAnalisesDoUsuario = (usuarioId: number) =>
 export const listarAnalisesDoCirculo = (usuarioId: number) =>
   get<CirculoAnaliseResponse[]>(`/usuarios/${usuarioId}/circulo/analises`)
 
-export const listarTodasAnalises = () => get<AnaliseResumoResponse[]>('/analises')
-
 export const buscarAnalise = (id: number) => get<AnaliseResponse>(`/analises/${id}`)
 
 export const enviarFeedback = (id: number, dados: FeedbackRequest) =>
