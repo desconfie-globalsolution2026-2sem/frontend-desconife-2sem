@@ -1,13 +1,62 @@
 import type { Sinal } from '../../types/Home/sinal'
 
+/*
+ * Os mesmos padroes e pesos da API Java: os de texto e de link ficam no banco
+ * (GET /padroes) e os de endereco disfarcado sao regras fixas do motor.
+ */
 export const sinais: Sinal[] = [
-  { nome: 'Pressa', peso: '+0,20', codigo: 'URGENCIA', critico: false, texto: '"Só hoje", "últimas horas", "responda agora". Golpista não quer que você pense.' },
-  { nome: 'Pede PIX', peso: '+0,25', codigo: 'PEDE_PIX', critico: false, texto: 'Pedido de transferência para resolver um problema que você não sabia que tinha.' },
-  { nome: 'Pede dados', peso: '+0,30', codigo: 'PEDE_DADOS', critico: false, texto: 'Senha, código do SMS, CPF ou número do cartão. Banco nenhum pede isso por mensagem.' },
-  { nome: 'Ameaça de bloqueio', peso: '+0,20', codigo: 'AMEACA_BLOQUEIO', critico: false, texto: '"Sua conta será bloqueada", "seu CPF está irregular". Medo faz a pessoa agir rápido.' },
-  { nome: 'Prêmio', peso: '+0,20', codigo: 'PREMIO', critico: false, texto: 'Sorteio que você não lembra de ter entrado, sempre com uma "taxa" para liberar.' },
-  { nome: 'Finge ser parente', peso: '+0,25', codigo: 'FINGE_PARENTE', critico: false, texto: '"Oi mãe, troquei de número". Ligue no número antigo antes de qualquer coisa.' },
-  { nome: 'Link suspeito', peso: '+0,35', codigo: 'URL_SUSPEITA', critico: false, texto: 'Endereço com cara de phishing, avaliado por um modelo treinado com 101 mil links.' },
-  { nome: 'Link encurtado', peso: '+0,15', codigo: 'LINK_ENCURTADO', critico: false, texto: 'bit.ly e parecidos escondem o destino real. Empresa séria usa o próprio site.' },
-  { nome: 'Imita uma marca', peso: 'crítico', codigo: 'DOMINIO_IMITA_MARCA', critico: true, texto: 'Usa o nome de um banco ou dos Correios num site que não é o oficial.' },
+  {
+    nome: 'Falso parente',
+    peso: '+30 a +35',
+    termos: ['troquei de numero', 'numero novo'],
+    texto: '"Oi mãe, troquei de número". Ligue no número antigo antes de qualquer coisa.',
+  },
+  {
+    nome: 'Falsa central do banco',
+    peso: '+30 a +35',
+    termos: ['codigo de verificacao', 'central de seguranca', 'compra nao reconhecida'],
+    texto: 'Finge ser do banco para pegar senha e código. Banco nenhum pede isso por mensagem.',
+  },
+  {
+    nome: 'Urgência e ameaça',
+    peso: '+20 a +30',
+    termos: ['sua conta sera bloqueada', 'urgente'],
+    texto: 'Cria pressa ou medo para você agir sem pensar.',
+  },
+  {
+    nome: 'Pedido de dinheiro',
+    peso: '+10 a +15',
+    termos: ['pix', 'transferencia', 'preciso de'],
+    texto: 'Pede Pix ou pagamento para resolver um problema que você não sabia que tinha.',
+  },
+  {
+    nome: 'Falso emprego',
+    peso: '+25',
+    termos: ['renda extra'],
+    texto: 'Trabalho fácil que no fim cobra uma taxa ou pede seus dados.',
+  },
+  {
+    nome: 'Pede para clicar',
+    peso: '+30',
+    termos: ['clique no link'],
+    texto: 'O golpe quase sempre termina num link. Abra o app oficial você mesmo.',
+  },
+  {
+    nome: 'Link que imita marca',
+    peso: '+35',
+    termos: ['nubank', 'itau'],
+    texto: 'Nome do banco num endereço que não é o site oficial dele.',
+  },
+  {
+    nome: 'Encurtador ou final suspeito',
+    peso: '+15 a +25',
+    termos: ['bit.ly', 'tinyurl.com', '.xyz', '.click', '.top', '.online'],
+    texto: 'Esconde o destino real ou usa um final de endereço barato, comum em sites falsos.',
+  },
+  {
+    nome: 'Endereço disfarçado',
+    peso: '+10 a +30',
+    termos: ['IP no lugar do nome', '@ no link', 'letras que imitam outras', 'sem HTTPS'],
+    texto: 'Truques no próprio endereço para parecer um site que ele não é.',
+  },
 ]

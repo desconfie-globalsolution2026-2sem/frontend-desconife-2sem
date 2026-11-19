@@ -71,27 +71,28 @@ export default function Home() {
               Os sinais que mais aparecem em golpes
             </h2>
             <p className="max-w-[58ch] text-[clamp(1.15rem,1.8vw,1.35rem)] leading-[1.5] text-muted">
-              Cada sinal tem um peso. Um sinal crítico sozinho já basta para o alerta máximo.
+              Cada padrão encontrado soma o seu peso uma vez só, até 100. Essa é a nota das regras;
+              a IA dá a outra nota, e o veredito sai da média das duas.
             </p>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {sinais.map((s) => (
-              <li key={s.codigo} className="grid content-start gap-1.5 rounded-[18px] bg-white p-[22px]">
+              <li key={s.nome} className="grid content-start gap-1.5 rounded-[18px] bg-white p-[22px]">
                 <div className="flex items-baseline justify-between gap-2">
                   <h3 className="text-[1.2rem] font-semibold">{s.nome}</h3>
-                  <span
-                    className={`rounded-full px-2 py-0.5 font-mono text-[.85rem] font-semibold tabular-nums ${
-                      s.critico ? 'bg-danger-bg text-danger' : 'bg-warn-bg text-amber-text'
-                    }`}
-                  >
+                  <span className="shrink-0 rounded-full bg-warn-bg px-2 py-0.5 font-mono text-[.85rem] font-semibold tabular-nums text-amber-text">
                     {s.peso}
                   </span>
                 </div>
-                <code className="font-mono text-[.72rem] text-muted">{s.codigo}</code>
+                <code className="font-mono text-[.72rem] text-muted">{s.termos.join(' · ')}</code>
                 <p className="text-[.98rem] text-muted">{s.texto}</p>
               </li>
             ))}
           </ul>
+          <p className="mt-5 max-w-[70ch] text-[.95rem] text-muted">
+            Link do site oficial cadastrado (como itau.com.br ou nubank.com.br) nunca passa de nota
+            29: fica sempre verde.
+          </p>
         </div>
       </section>
 

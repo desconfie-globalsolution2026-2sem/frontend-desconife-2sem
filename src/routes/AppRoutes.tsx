@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Routes, Route } from "react-router-dom";
 import Layout from '../components/layout/Layout.tsx';
 import Analisar from '../pages/Analisar/Analisar.tsx';
 import Cadastro from '../pages/Cadastro/Cadastro.tsx';
@@ -18,7 +18,8 @@ export default function AppRoutes() {
     <Routes>
         <Route element={<Layout />}>
             <Route index element={<Home />} />
-            <Route path="/quem-somos" element={<QuemSomos />} />
+            <Route path="/integrantes" element={<QuemSomos />} />
+            <Route path="/quem-somos" element={<Navigate to="/integrantes" replace />} />
             <Route path="/sobre" element={<Sobre />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/contato" element={<Contato />} />

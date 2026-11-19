@@ -3,7 +3,7 @@ import type { Passo } from '../../types/Home/passo'
 export const passos: Passo[] = [
   {
     titulo: 'Cole a mensagem ou o link',
-    texto: 'Copie do WhatsApp, do SMS ou do e-mail e cole no campo. Não precisa criar conta.',
+    texto: 'Entre na sua conta, copie do WhatsApp, do SMS ou do e-mail e cole no campo. Também vale só o link ou um print.',
   },
   {
     titulo: 'A gente procura os sinais',
