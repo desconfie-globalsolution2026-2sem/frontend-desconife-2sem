@@ -3,7 +3,7 @@ import { useCarregar } from '../../hooks/useCarregar'
 import type { UsuarioResponse } from '../../types/Api/dtos'
 import { dataBr } from '../../utils/formatar'
 import EstadoCarga from '../layout/EstadoCarga'
-import Bloco from './Bloco'
+import Bloco from '../layout/Bloco'
 
 /* Quem recebe aviso quando esta pessoa analisa algo arriscado. */
 export default function SeuGuardiao({ usuario }: { usuario: UsuarioResponse }) {

@@ -4,7 +4,7 @@ import { useCarregar } from '../../hooks/useCarregar'
 import { dataHoraBr, notaBr } from '../../utils/formatar'
 import SeloFaixa from '../analise/SeloFaixa'
 import EstadoCarga from '../layout/EstadoCarga'
-import Bloco from './Bloco'
+import Bloco from '../layout/Bloco'
 
 /* Tudo que o circulo mandou analisar, inclusive o proprio usuario. */
 export default function AnalisesDoCirculo({ usuarioId }: { usuarioId: number }) {

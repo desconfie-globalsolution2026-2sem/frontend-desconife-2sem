@@ -8,7 +8,7 @@ interface Props {
   children: ReactNode
 }
 
-/* Moldura de cada parte da tela do circulo: titulo, explicacao curta e conteudo. */
+/* Moldura dos blocos do Circulo e da Minha conta: titulo, explicacao curta e conteudo. */
 export default function Bloco({ titulo, texto, extra, children }: Props) {
   return (
     <section className="grid content-start gap-4 rounded-[28px] bg-surface p-6 md:p-7">

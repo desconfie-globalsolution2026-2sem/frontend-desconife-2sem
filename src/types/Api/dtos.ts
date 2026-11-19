@@ -147,12 +147,34 @@ export interface AlertaResponse {
   lido: boolean
 }
 
-/* Padroes (regras do motor), listados na Home */
+/* Categorias e padroes (regras do motor): listados na Home, cadastrados na Minha conta */
+
+export interface CategoriaRequest {
+  nome: string
+  descricao: string
+  orientacao: string
+}
+
+export interface CategoriaResponse {
+  id: number
+  nome: string
+  descricao: string
+  orientacao: string
+}
+
+/* categoriaId fica vazio so no tipo DOMINIO_OFICIAL (site oficial, nao e golpe). */
+export interface PadraoRequest {
+  categoriaId?: number
+  tipo: TipoPadrao
+  termo: string
+  peso: number
+  ativo?: boolean
+}
 
 export interface PadraoResponse {
   id: number
-  categoriaId: number
-  categoriaNome: string
+  categoriaId: number | null
+  categoriaNome: string | null
   tipo: TipoPadrao
   termo: string
   peso: number

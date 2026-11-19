@@ -5,7 +5,7 @@ import { useCarregar } from '../../hooks/useCarregar'
 import { dataHoraBr, notaBr } from '../../utils/formatar'
 import SeloFaixa from '../analise/SeloFaixa'
 import EstadoCarga from '../layout/EstadoCarga'
-import Bloco from './Bloco'
+import Bloco from '../layout/Bloco'
 
 /* Avisos de quando alguem do circulo analisou algo arriscado. Nao lidos primeiro. */
 export default function Alertas({ usuarioId }: { usuarioId: number }) {
