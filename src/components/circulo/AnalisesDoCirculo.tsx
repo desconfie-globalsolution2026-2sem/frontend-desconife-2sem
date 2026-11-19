@@ -1,4 +1,4 @@
-import { listarAnalisesDoCirculo } from '../../api/endpoints/analises'
+import { listarAnalisesDoCirculo } from '../../services/endpoints/analises'
 import { rotuloDoTipo } from '../../data/Analise/tipos'
 import { useCarregar } from '../../hooks/useCarregar'
 import { dataHoraBr, notaBr } from '../../utils/formatar'

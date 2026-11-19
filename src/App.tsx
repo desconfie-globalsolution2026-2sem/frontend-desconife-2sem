@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
-import { verificarSaude } from './api/endpoints/health'
+import { verificarSaude } from './services/endpoints/health'
 import SessaoProvider from './context/SessaoProvider.tsx'
 import AppRoutes from './routes/AppRoutes.tsx'
 

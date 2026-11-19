@@ -52,7 +52,7 @@ O site foi construído com **React, TypeScript, Vite e Tailwind CSS**, com rotea
 
 ## 🔌 Integração com a API Java
 
-A URL da API vem da variável de ambiente `VITE_API_URL`. Toda requisição passa por `src/api/api.ts`, que usa `fetch`, trata o JSON de erro padrão da API (`{ status, erro, mensagem, campos }`) e expõe atalhos `get`, `post`, `put`, `patch` e `del`. Cada recurso tem seu arquivo de serviço em `src/api/endpoints/`.
+A URL da API vem da variável de ambiente `VITE_API_URL`. Toda requisição passa por `src/services/api.ts`, que usa `fetch`, trata o JSON de erro padrão da API (`{ status, erro, mensagem, campos }`) e expõe atalhos `get`, `post`, `put`, `patch` e `del`. Cada recurso tem seu arquivo de serviço em `src/services/endpoints/`.
 
 | Tela | Método | Endpoint |
 |---|---|---|
@@ -146,7 +146,7 @@ desconfie-front-end/
     │   ├── form/                 # CampoSenha, MsgErro, classes de campo
     │   └── button/               # Button (botão ou link de rota)
     │
-    ├── api/
+    ├── services/
     │   ├── api.ts                # Camada de rede com fetch e tratamento de erro
     │   └── endpoints/            # Um arquivo por recurso: usuarios, analises, alertas, categorias, padroes, health
     │

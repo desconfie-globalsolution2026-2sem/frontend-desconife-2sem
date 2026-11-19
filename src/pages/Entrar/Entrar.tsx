@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { login } from '../../api/endpoints/usuarios'
+import { login } from '../../services/endpoints/usuarios'
 import Button from '../../components/button/Button'
 import CampoSenha from '../../components/form/CampoSenha'
 import { classeCampo } from '../../components/form/classeCampo'

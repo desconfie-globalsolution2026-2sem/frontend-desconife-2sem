@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { mensagemDeErro } from '../../api/api'
-import { adicionarDependente, listarDependentes, removerDependente } from '../../api/endpoints/usuarios'
+import { mensagemDeErro } from '../../services/api'
+import { adicionarDependente, listarDependentes, removerDependente } from '../../services/endpoints/usuarios'
 import { useCarregar } from '../../hooks/useCarregar'
 import { useFormulario } from '../../hooks/useFormulario'
 import type { MembroCirculoResponse } from '../../types/Api/dtos'
