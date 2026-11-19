@@ -1,4 +1,4 @@
-import type { Ods } from '../../types/Quem Somos/ods'
+import type { Ods } from '../../types/Integrantes/ods'
 
 export const ods: Ods[] = [
   {

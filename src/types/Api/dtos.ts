@@ -147,28 +147,7 @@ export interface AlertaResponse {
   lido: boolean
 }
 
-/* Categorias e padroes (regras do motor) */
-
-export interface CategoriaRequest {
-  nome: string
-  descricao: string
-  orientacao: string
-}
-
-export interface CategoriaResponse {
-  id: number
-  nome: string
-  descricao: string
-  orientacao: string
-}
-
-export interface PadraoRequest {
-  categoriaId?: number
-  tipo: TipoPadrao
-  termo: string
-  peso: number
-  ativo?: boolean
-}
+/* Padroes (regras do motor), listados na Home */
 
 export interface PadraoResponse {
   id: number

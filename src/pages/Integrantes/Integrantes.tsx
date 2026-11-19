@@ -1,6 +1,6 @@
-import { integrantes } from '../../data/QuemSomos/integrantes'
-import { ods } from '../../data/QuemSomos/ods'
-import { valores } from '../../data/QuemSomos/valores'
+import { integrantes } from '../../data/Integrantes/integrantes'
+import { ods } from '../../data/Integrantes/ods'
+import { valores } from '../../data/Integrantes/valores'
 
 function IconeGitHub() {
   return (
@@ -23,7 +23,7 @@ const h2 = 'text-[clamp(1.8rem,3.4vw,2.6rem)] font-bold'
 const lead = 'max-w-[58ch] text-[clamp(1.15rem,1.8vw,1.35rem)] leading-[1.5] text-muted'
 const wrap = 'mx-auto max-w-[1080px] px-5'
 
-export default function QuemSomos() {
+export default function Integrantes() {
   return (
     <main>
       {/* Cabeçalho da página */}

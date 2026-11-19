@@ -1,8 +1,8 @@
 import { useEffect } from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import { verificarSaude } from './services/endpoints/health'
-import SessaoProvider from './context/SessaoProvider.tsx'
-import AppRoutes from './routes/AppRoutes.tsx'
+import SessaoProvider from './context/SessaoProvider'
+import AppRoutes from './routes/AppRoutes'
 
 export default function App() {
   /*

@@ -10,10 +10,6 @@ import type {
 } from '../../types/Api/dtos'
 import { ErroApi, del, get, post, put } from '../api'
 
-export const listarUsuarios = () => get<UsuarioResponse[]>('/usuarios')
-
-export const buscarUsuario = (id: number) => get<UsuarioResponse>(`/usuarios/${id}`)
-
 export const cadastrarUsuario = (dados: UsuarioRequest) => post<UsuarioResponse>('/usuarios', dados)
 
 export const atualizarUsuario = (id: number, dados: UsuarioUpdateRequest) =>
