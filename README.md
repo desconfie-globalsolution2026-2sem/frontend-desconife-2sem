@@ -65,6 +65,9 @@ A URL da API vem da variável de ambiente `VITE_API_URL`. Toda requisição pass
 | Excluir análise | `DELETE` | `/analises/{id}` |
 | Círculo de confiança | `GET` / `POST` / `DELETE` | `/usuarios/{id}/guardiao`, `/usuarios/{id}/dependentes`, `/usuarios/{id}/alertas`, `/usuarios/{id}/circulo/analises` |
 | Alertas | `PATCH` | `/alertas/{id}/lido` |
+| Minha conta | `PUT` / `DELETE` | `/usuarios/{id}` |
+| Home (sinais) | `GET` | `/padroes` |
+| Abertura do site | `GET` | `/health` (acorda a API no Render) |
 
 Os tipos de requisição e resposta (DTOs) ficam em `src/types/Api/dtos.ts`.
 
@@ -84,6 +87,7 @@ Os tipos de requisição e resposta (DTOs) ficam em `src/types/Api/dtos.ts`.
 | `/analisar` | Analisar mensagem, link ou print | Estática |
 | `/minhas-analises` | Histórico do usuário | Estática |
 | `/circulo` | Círculo de confiança | Estática |
+| `/minha-conta` | Editar dados e excluir a conta | Estática |
 | `/analises/:id` | Página de uma análise | **Dinâmica** |
 | `*` | Página não encontrada (404) | Coringa |
 

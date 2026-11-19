@@ -3,6 +3,7 @@ import Layout from '../components/layout/Layout.tsx';
 import Analisar from '../pages/Analisar/Analisar.tsx';
 import Cadastro from '../pages/Cadastro/Cadastro.tsx';
 import Circulo from '../pages/Circulo/Circulo.tsx';
+import MinhaConta from '../pages/MinhaConta/MinhaConta.tsx';
 import Contato from '../pages/Contato/Contato.tsx';
 import DetalheAnalise from '../pages/DetalheAnalise/DetalheAnalise.tsx';
 import NaoEncontrada from '../pages/NaoEncontrada/NaoEncontrada.tsx';
@@ -28,6 +29,7 @@ export default function AppRoutes() {
             <Route path="/analisar" element={<Analisar />} />
             <Route path="/minhas-analises" element={<MinhasAnalises />} />
             <Route path="/circulo" element={<Circulo />} />
+            <Route path="/minha-conta" element={<MinhaConta />} />
             <Route path="/analises/:id" element={<DetalheAnalise />} />
             <Route path="*" element={<NaoEncontrada />} />
         </Route>
