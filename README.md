@@ -66,6 +66,8 @@ A URL da API vem da variável de ambiente `VITE_API_URL`. Toda requisição pass
 | Círculo de confiança | `GET` / `POST` / `DELETE` | `/usuarios/{id}/guardiao`, `/usuarios/{id}/dependentes`, `/usuarios/{id}/alertas`, `/usuarios/{id}/circulo/analises` |
 | Alertas | `PATCH` | `/alertas/{id}/lido` |
 | Minha conta | `PUT` / `DELETE` | `/usuarios/{id}` |
+| Minha conta (regras) | `GET` / `POST` / `DELETE` | `/categorias`, `/categorias/{id}` |
+| Minha conta (regras) | `GET` / `POST` / `PUT` / `DELETE` | `/padroes`, `/padroes/{id}` |
 | Home (sinais) | `GET` | `/padroes` |
 | Abertura do site | `GET` | `/health` (acorda a API no Render) |
 
@@ -87,7 +89,7 @@ Os tipos de requisição e resposta (DTOs) ficam em `src/types/Api/dtos.ts`.
 | `/analisar` | Analisar mensagem, link ou print | Estática |
 | `/minhas-analises` | Histórico do usuário | Estática |
 | `/circulo` | Círculo de confiança | Estática |
-| `/minha-conta` | Editar dados e excluir a conta | Estática |
+| `/minha-conta` | Editar dados, excluir a conta e cadastrar categorias e padrões de golpe | Estática |
 | `/analises/:id` | Página de uma análise | **Dinâmica** |
 | `*` | Página não encontrada (404) | Coringa |
 
@@ -137,13 +139,14 @@ desconfie-front-end/
     │   ├── MinhasAnalises/       # Histórico do usuário (GET)
     │   ├── DetalheAnalise/       # Rota dinâmica /analises/:id (GET, PUT, DELETE)
     │   ├── Circulo/              # Círculo de confiança
-    │   ├── MinhaConta/           # Editar dados e excluir a conta (PUT, DELETE)
+    │   ├── MinhaConta/           # Dados da conta e regras de detecção (categorias e padrões)
     │   └── NaoEncontrada/        # Página 404
     │
     ├── components/
-    │   ├── layout/               # Header (com menu mobile), Footer, Layout, MenuConta, EstadoCarga, PedirLogin
+    │   ├── layout/               # Header (com menu mobile), Footer, Layout, MenuConta, EstadoCarga, PedirLogin, Bloco
     │   ├── analise/              # CardVeredito, SeloFaixa, Feedback, EscolherImagem
-    │   ├── circulo/              # SeuGuardiao, Dependentes, Alertas, AnalisesDoCirculo, Bloco
+    │   ├── circulo/              # SeuGuardiao, Dependentes, Alertas, AnalisesDoCirculo
+    │   ├── conta/                # RegrasDeteccao, Categorias, Padroes (Minha conta)
     │   ├── form/                 # CampoSenha, MsgErro, classes de campo
     │   └── button/               # Button (botão ou link de rota)
     │

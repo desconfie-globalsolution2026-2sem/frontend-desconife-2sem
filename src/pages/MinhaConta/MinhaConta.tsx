@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { mensagemDeErro } from '../../services/api'
 import { atualizarUsuario, excluirUsuario } from '../../services/endpoints/usuarios'
 import Button from '../../components/button/Button'
+import RegrasDeteccao from '../../components/conta/RegrasDeteccao'
 import { classeCampo } from '../../components/form/classeCampo'
 import PedirLogin from '../../components/layout/PedirLogin'
 import { useFormulario } from '../../hooks/useFormulario'
@@ -37,9 +38,10 @@ function validar(dados: FormData): Erros {
 }
 
 /*
- * Minha conta: editar nome, e-mail e telefone (PUT /usuarios/{id}) e excluir
- * a conta (DELETE /usuarios/{id}). A API nao deixa excluir quem ainda tem
- * analises guardadas; nesse caso a tela explica e manda para o historico.
+ * Minha conta: editar nome, e-mail e telefone (PUT /usuarios/{id}), excluir
+ * a conta (DELETE /usuarios/{id}) e cuidar das regras de deteccao (categorias
+ * e padroes). A API nao deixa excluir quem ainda tem analises guardadas;
+ * nesse caso a tela explica e manda para o historico.
  */
 export default function MinhaConta() {
   const { usuario, atualizar, sair } = useSessao()
@@ -80,7 +82,7 @@ export default function MinhaConta() {
         <p className={eyebrow}>Minha conta</p>
         <h1 className="mt-3 text-[clamp(2.2rem,5vw,3.4rem)] font-bold">Seus dados</h1>
         <p className="mt-4 max-w-[58ch] text-[clamp(1.15rem,1.8vw,1.35rem)] leading-[1.5] text-muted">
-          Confira e corrija o que a gente guarda sobre você. Se não quiser mais usar o Desconfie, dá
+          Confira e corrija o que a gente guarda sobre você e cuide das regras que o Desconfie usa para achar golpes. Se não quiser mais usar o Desconfie, dá
           para excluir a conta aqui também.
         </p>
       </div>
@@ -224,6 +226,12 @@ export default function MinhaConta() {
             </>
           )}
         </div>
+
+        {usuario && (
+          <div className={`${wrap} mt-14`}>
+            <RegrasDeteccao />
+          </div>
+        )}
       </section>
     </main>
   )

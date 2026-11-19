@@ -10,7 +10,7 @@ import Button from '../button/Button'
 import { classeCampo } from '../form/classeCampo'
 import MsgErro from '../form/MsgErro'
 import EstadoCarga from '../layout/EstadoCarga'
-import Bloco from './Bloco'
+import Bloco from '../layout/Bloco'
 
 type Erros = { email?: string }
 
