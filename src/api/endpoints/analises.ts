@@ -1,26 +1,28 @@
-/* /analises: mandar uma mensagem para analise, listar o historico, abrir uma e dar feedback. */
+/* /analises: analisar mensagem, link ou imagem, historico e feedback. */
 import type {
   AnaliseRequest,
   AnaliseResponse,
   AnaliseResumoResponse,
-  Feedback,
+  CirculoAnaliseResponse,
+  FeedbackRequest,
 } from '../../types/Api/dtos'
-import { mascararDados } from '../../utils/mascarar'
 import { del, get, post, put } from '../api'
 
-/* A API tambem mascara, mas aqui o CPF nem chega a sair do navegador. */
-export const criarAnalise = (usuarioId: number, dados: AnaliseRequest) =>
-  post<AnaliseResponse>(`/usuarios/${usuarioId}/analises`, {
-    ...dados,
-    conteudo: dados.conteudo && mascararDados(dados.conteudo),
-  })
+export const analisar = (usuarioId: number, dados: AnaliseRequest) =>
+  post<AnaliseResponse>(`/usuarios/${usuarioId}/analises`, dados)
 
 export const listarAnalisesDoUsuario = (usuarioId: number) =>
   get<AnaliseResumoResponse[]>(`/usuarios/${usuarioId}/analises`)
 
+/* Analises dos dependentes, vistas pelo guardiao. */
+export const listarAnalisesDoCirculo = (usuarioId: number) =>
+  get<CirculoAnaliseResponse[]>(`/usuarios/${usuarioId}/circulo/analises`)
+
+export const listarTodasAnalises = () => get<AnaliseResumoResponse[]>('/analises')
+
 export const buscarAnalise = (id: number) => get<AnaliseResponse>(`/analises/${id}`)
 
-export const enviarFeedback = (id: number, feedback: Feedback) =>
-  put<AnaliseResponse>(`/analises/${id}`, { feedback })
+export const enviarFeedback = (id: number, dados: FeedbackRequest) =>
+  put<AnaliseResponse>(`/analises/${id}`, dados)
 
 export const excluirAnalise = (id: number) => del(`/analises/${id}`)

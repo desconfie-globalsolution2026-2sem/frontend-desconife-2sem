@@ -2,16 +2,14 @@ import { faixas } from '../../data/Analise/faixas'
 import type { AnaliseResponse } from '../../types/Api/dtos'
 import { notaBr, pesoBr } from '../../utils/formatar'
 
-/* Resultado de uma analise: veredito, nota, orientacao e o que a API encontrou. */
+/* Resultado de uma analise: veredito, nota, orientacao e os sinais que a API encontrou. */
 export default function CardVeredito({ analise }: { analise: AnaliseResponse }) {
   const info = faixas[analise.risco]
+
+  /* Termos do texto e sinais do link viram uma lista so. */
   const sinais = [
-    ...analise.padroesEncontrados.map((p) => ({
-      chave: `p${p.id}`,
-      nome: `"${p.termo}"${p.ocorrencias > 1 ? ` (${p.ocorrencias}x)` : ''}${p.categoria ? ` · ${p.categoria}` : ''}`,
-      peso: p.peso,
-    })),
-    ...analise.sinaisLink.map((s, i) => ({ chave: `l${i}`, nome: s.descricao, peso: s.peso })),
+    ...analise.padroesEncontrados.map((p) => ({ nome: `“${p.termo}”`, detalhe: p.categoria, peso: p.peso })),
+    ...analise.sinaisLink.map((s) => ({ nome: s.descricao, detalhe: 'Link', peso: s.peso })),
   ]
 
   return (
@@ -25,12 +23,9 @@ export default function CardVeredito({ analise }: { analise: AnaliseResponse }) 
       </div>
 
       {analise.categoriaPrincipal && (
-        <p className="text-[1.02rem] text-ink">
-          Parece um golpe do tipo <strong>{analise.categoriaPrincipal}</strong>.
-        </p>
+        <p className="font-semibold text-ink">{analise.categoriaPrincipal}</p>
       )}
-
-      <p className="text-[1.08rem] text-ink">{analise.orientacao || info.texto}</p>
+      <p className="text-[1.08rem] text-ink">{analise.orientacao}</p>
 
       {sinais.length > 0 ? (
         <div>
@@ -38,23 +33,25 @@ export default function CardVeredito({ analise }: { analise: AnaliseResponse }) 
           <ul className="mt-2 grid list-none gap-2 p-0">
             {sinais.map((s) => (
               <li
-                key={s.chave}
+                key={`${s.detalhe}-${s.nome}`}
                 className="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-white/70 px-4 py-2.5"
               >
-                <span className="min-w-0 font-medium break-words">{s.nome}</span>
+                <span>
+                  <span className="font-medium">{s.nome}</span>{' '}
+                  <span className="text-[.92rem] text-muted">· {s.detalhe}</span>
+                </span>
                 <span className="font-mono text-[.95rem] text-muted">{pesoBr(s.peso)}</span>
               </li>
             ))}
           </ul>
         </div>
       ) : (
-        <p className="text-[.98rem] text-muted">Nenhuma regra de golpe bateu nesta mensagem.</p>
+        <p className="text-[.98rem] text-muted">Nenhuma regra de golpe bateu com esta mensagem.</p>
       )}
 
-      <p className="text-[.9rem] text-muted">
-        Regras {notaBr(analise.notaRegras)} ·{' '}
-        {analise.iaDisponivel ? `IA ${notaBr(analise.notaIa)}` : 'IA fora do ar, nota só pelas regras'}
-      </p>
+      {!analise.iaDisponivel && (
+        <p className="text-[.92rem] text-muted">A IA estava fora do ar: a nota saiu só das regras.</p>
+      )}
     </section>
   )
 }
