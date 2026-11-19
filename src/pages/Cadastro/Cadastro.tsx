@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { cadastrarUsuario } from '../../api/endpoints/usuarios'
 import Button from '../../components/button/Button'
 import CampoSenha from '../../components/form/CampoSenha'
 import { classeCampo } from '../../components/form/classeCampo'
 import { pedidos } from '../../data/Cadastro/pedidos'
 import { useFormulario } from '../../hooks/useFormulario'
+import { useSessao } from '../../hooks/useSessao'
 import { emailValido, marcado, mensagens, nivelSenha, senhaDe, textoDe } from '../../utils/validacoes'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
@@ -28,7 +30,8 @@ function validar(dados: FormData): Erros {
   const senha = senhaDe(dados, 'senha')
   const conf = senhaDe(dados, 'conf')
 
-  if (nome.length < 2) novos.nome = mensagens.nome
+  /* A API pede nome com pelo menos 3 letras. */
+  if (nome.length < 3) novos.nome = mensagens.nome
   if (!emailValido(email)) novos.email = mensagens.email
   if (senha.length < 8 || !/[a-zA-Z]/.test(senha) || !/\d/.test(senha))
     novos.senha = mensagens.senhaFraca
@@ -39,10 +42,21 @@ function validar(dados: FormData): Erros {
 }
 
 export default function Cadastro() {
-  /* A barra de forca acende enquanto digita, entao o estado fica aqui.
-     O hook zera ela quando o cadastro da certo e o formulario e limpo. */
+  /* A barra de forca acende enquanto digita, entao o estado fica aqui. */
   const [forca, setForca] = useState(0)
-  const { erros, sucesso, aoEnviar } = useFormulario(validar, () => setForca(0))
+  const { entrar } = useSessao()
+  const navegar = useNavigate()
+
+  /* Cadastro deu certo: a API ja devolve o usuario, entao entra direto. */
+  const { erros, enviando, erroEnvio, aoEnviar } = useFormulario(validar, async (dados) => {
+    const usuario = await cadastrarUsuario({
+      nome: textoDe(dados, 'nome'),
+      email: textoDe(dados, 'email'),
+      senha: senhaDe(dados, 'senha'),
+    })
+    entrar(usuario)
+    navegar('/analisar')
+  })
 
   return (
     <main>
@@ -140,17 +154,13 @@ export default function Cadastro() {
               )}
             </div>
 
-            <Button type="submit" className="w-full">
-              Criar conta
+            <Button type="submit" disabled={enviando} aria-busy={enviando} className="w-full disabled:opacity-60">
+              {enviando ? 'Criando conta…' : 'Criar conta'}
             </Button>
 
-            {sucesso && (
-              <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
-                <strong className="text-safe">Conta criada nesta demonstração.</strong> No site
-                final, a API Java grava o cadastro no Oracle e você já entra logado.{' '}
-                <Link to="/entrar" className="font-semibold text-navy underline underline-offset-4">
-                  Ir para o login
-                </Link>
+            {erroEnvio && (
+              <p role="alert" className="rounded-2xl bg-danger-bg p-4 text-ink">
+                <strong className="text-danger">Não deu para criar a conta.</strong> {erroEnvio}
               </p>
             )}
           </form>

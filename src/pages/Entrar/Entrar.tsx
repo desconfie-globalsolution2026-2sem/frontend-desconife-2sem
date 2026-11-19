@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { login } from '../../api/endpoints/usuarios'
 import Button from '../../components/button/Button'
 import CampoSenha from '../../components/form/CampoSenha'
 import { classeCampo } from '../../components/form/classeCampo'
 import { vantagens } from '../../data/Entrar/vantagens'
 import { useFormulario } from '../../hooks/useFormulario'
-import { emailValido, mensagens, senhaDe, textoDe } from '../../utils/validacoes'
+import { useSessao } from '../../hooks/useSessao'
+import { emailValido, marcado, mensagens, senhaDe, textoDe } from '../../utils/validacoes'
 
 const wrap = 'mx-auto max-w-[1080px] px-5'
 const eyebrow = 'text-[.95rem] font-semibold text-amber-text'
@@ -56,8 +58,15 @@ function validar(dados: FormData): Erros {
 }
 
 export default function Entrar() {
-  const { erros, sucesso, aoEnviar } = useFormulario(validar)
+  const { entrar } = useSessao()
+  const navegar = useNavigate()
   const [mostrarEsqueci, setMostrarEsqueci] = useState(false)
+
+  const { erros, enviando, erroEnvio, aoEnviar } = useFormulario(validar, async (dados) => {
+    const usuario = await login({ email: textoDe(dados, 'email'), senha: senhaDe(dados, 'senha') })
+    entrar(usuario, marcado(dados, 'lembrar'))
+    navegar('/minhas-analises')
+  })
 
   return (
     <main>
@@ -119,24 +128,15 @@ export default function Entrar() {
               </p>
             )}
 
-            <Button type="submit" className="w-full">
-              Entrar
+            <Button type="submit" disabled={enviando} aria-busy={enviando} className="w-full disabled:opacity-60">
+              {enviando ? 'Entrando…' : 'Entrar'}
             </Button>
 
-            {sucesso && (
-              <p role="status" className="rounded-2xl bg-safe-bg p-4 text-ink">
-                <strong className="text-safe">Login feito nesta demonstração.</strong> No site
-                final, a API Java confere o e-mail e a senha e abre o seu histórico.
+            {erroEnvio && (
+              <p role="alert" className="rounded-2xl bg-danger-bg p-4 text-ink">
+                <strong className="text-danger">Não deu para entrar.</strong> {erroEnvio}
               </p>
             )}
-
-            <div className="flex items-center gap-3.5 text-[.92rem] text-muted before:h-px before:flex-1 before:bg-line after:h-px after:flex-1 after:bg-line">
-              ou
-            </div>
-
-            <Button to="/" variante="secundario" className="w-full bg-white shadow-[inset_0_0_0_1px_var(--color-line)]">
-              Continuar sem conta
-            </Button>
           </form>
 
           <p className="text-[.95rem] text-muted">
@@ -175,9 +175,10 @@ export default function Entrar() {
           </div>
 
           <div className="grid gap-1.5 rounded-card bg-surface p-5.5">
-            <h2 className="text-[1.2rem] font-semibold">Não quer criar conta?</h2>
+            <h2 className="text-[1.2rem] font-semibold">Por que precisa de conta?</h2>
             <p className="text-[.98rem] text-muted">
-              Tudo bem. A análise funciona sem login. A conta só serve para guardar o histórico.
+              Cada análise fica guardada no seu nome. É assim que o histórico e o aviso para quem
+              cuida de você funcionam.
             </p>
           </div>
         </div>

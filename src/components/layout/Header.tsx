@@ -1,5 +1,6 @@
 import { NavLink } from 'react-router-dom'
 import Logo from '../../assets/desconfie-logo.svg'
+import MenuConta from './MenuConta'
 
 const navItems = [
   { path: '/', label: 'Início' },
@@ -41,12 +42,7 @@ export default function Header() {
             ))}
 
             <li>
-              <NavLink
-                to="/entrar"
-                className="ml-2 flex min-h-11 items-center rounded-full bg-navy px-4.5 text-[.98rem] font-medium text-white no-underline transition-colors hover:bg-[#163a60]"
-              >
-                Entrar
-              </NavLink>
+              <MenuConta />
             </li>
           </ul>
         </nav>
